@@ -1,5 +1,5 @@
 #' @title sinaplot
-#' @description
+#' @description blah blah blah blah blah blah blah blah blah blah blah blah
 #'
 #' @param x numeric vector of values to be plotted
 #' @param groups vector of length x
@@ -10,11 +10,11 @@
 #' @param method blah blah blah blah
 #' @param ...
 #'
-#' @return
+#' @return blah blah blah blah
 #'
 #' @export
 
-sinaplot <- function(x, groups, labels = NULL, plot = TRUE, relScaling = T,
+sinaplot <- function(x, groups, labels = NULL, plot = TRUE, relScaling = TRUE,
                      ypercentage = 0.02, xpercentage = 0.1, neighbLimit = 1,
                      adjust = 1, method = "neighbours", ...)
 {
