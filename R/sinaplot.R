@@ -3,46 +3,83 @@
 #'
 #' @param x numeric vector of values to be plotted
 #' @param groups vector of length x
-#' @param labels optional
-#' @param plot logical. Default: TRUE
-#' @param neighbLimit blah blah
-#' @param adjust blah blah blah
 #' @param method blah blah blah blah
-#' @param ...
+#' @param relScaling blah
+#' @param yFraction binning factor. The range of the values in \code{x} are
+#' binned in windows of length \code{(max(x) - min(x)) * yFraction}. Samples
+#' within the same bin belong to the same "neighbourhood".
+#' @param neighbLimit if the samples within the same y-axis bin are more than
+#' neighbLimit, the samples's X coordinates will be adjusted
+#' @param adjust adjusts the bandwidth of the density kernel when
+#' \code{method = "density"} (see \code{\link{density}}).
+#' @param xSpread tuning parameter that adjusts the spread of the samples within
+#' the same neighbourhood along the x-axis when \code{method = "neighbourhood"}.
+#' Accepts values between 0 and 1.
+#' @param labels optional arguments that controls the labels along the x-axis.
+#' Must be of length \code{unique(groups)}.
+#' @param plot logical. When TRUE the sinaplot is produced, otherwise the
+#' function returns the new sample coordinates. Default: TRUE
+#' @param ... Arguments to be passed to methods, such as graphical parameters
+#' (see \code{\link{par}}).
 #'
 #' @return blah blah blah blah
 #'
 #' @export
 
-sinaplot <- function(x, groups, labels = NULL, plot = TRUE, relScaling = TRUE,
-                     ypercentage = 0.02, xpercentage = 0.1, neighbLimit = 1,
-                     adjust = 1, method = "neighbours", ...)
+sinaplot <- function(x, groups, method = "density", relScaling = TRUE,
+                     yFraction = 0.02, neighbLimit = 1, adjust = 3/4,
+                     xSpread = 0.1, labels = NULL, plot = TRUE, ...)
 {
 
     ###CHECK STUFF
+    if (length(x) != length(groups))
+        stop("x and groups must be of the same length.")
 
+    if (neighbLimit < 1 | !is.numeric(neighbLimit)){
+        warning("Invalid neighbLimit value. Neighblimit was set to 1.")
+        neighbLimit = 1
+    }
+
+    if (!is.null(labels) & length(labels) != length(unique(groups)))
+        stop("labels and unique 'groups' values must be of the same length.")
+
+    if (yFraction <= 0)
+        stop("yFraction must be > 0")
+
+    if (xSpread <= 0)
+        stop("xSpread must be > 0")
+
+    if (!(method %in% c("density", "neighbourhood"))){
+        warning("Input method not available. Choosing 'density' instead.")
+        message("Available methods: 'density', 'neighbourhood'")
+        method <- "density"
+    }
     ###END OF STUFF CHECKING
 
-    yBins <- .binY(x, ypercentage)
+    yBins <- .binY(x, yFraction)
 
     #calculate new x coordinates
-    x <- .getXcoord(x, groups, yBins, xpercentage, relScaling, neighbLimit,
+    x <- .getXcoord(x, groups, yBins, xSpread, relScaling, neighbLimit,
                     adjust, method)
 
     #number of groups
     ngroups <- length(unique(groups))
 
-    #
     newGroups <- rep(unique(groups), unlist(lapply(x, nrow)))
+
+    if (!is.null(labels))
+        labs <- labels
+    else
+        labs <- unique(groups)
 
     x <- do.call(rbind, x)
 
-    if (plot){
+    if (plot == TRUE){
         plot(x, xaxt = "n", col = newGroups, ylab = "log2 expression", xlab = "",
              xlim = c(0,(ngroups+1)), ...)
         axis(1, at = 1:ngroups, labels = FALSE)
-        text(1:ngroups, par("usr")[3] - 0.4, srt = 45, labels = unique(groups),
-             adj = 1, xpd = T)
+        text(1:ngroups, par("usr")[3] - 0.4, srt = 45, labels = labs, adj = 1,
+             xpd = T)
     } else
         list(x, newGroups)
 }
@@ -63,7 +100,7 @@ sinaplot <- function(x, groups, labels = NULL, plot = TRUE, relScaling = TRUE,
     yBins
 }
 
-.getXcoord <- function(data, groups, yBins, xFraction, relScaling,
+.getXcoord <- function(data, groups, yBins, xSpread, relScaling,
                        neighbLimit, adjust, method){
 
     #number of groups
@@ -114,32 +151,32 @@ sinaplot <- function(x, groups, labels = NULL, plot = TRUE, relScaling = TRUE,
         xyArray <- c(xyArray, list(cur_xyArray))
     }
 
-    if (method == "density"){
-        if (maxDensity > 0.45)
-            scalingFactor <- 0.45 / maxDensity
-        else
-            scalingFactor <- 1
-    }else {
-        #if the space required to spread the samples in a neighbourhood exceeds
-        #1, create a scaling factor to compress the points
-        if (maxNeighbours > 1/xFraction){
-            scalingFactor <- (1/xFraction) / maxNeighbours
-        }else
-            scalingFactor <- 1
-    }
-
     relScalingFactor <- 1
 
     for (j in 1:ngroups){
 
+        if (method == "density"){
+            if (max(densities[[j]]$y) > 0.45)
+                scalingFactor <- 0.45 / max(densities[[j]]$y)
+            else
+                scalingFactor <- 1
+        }else {
+            #if the space required to spread the samples in a neighbourhood exceeds
+            #1, create a scaling factor to compress the points
+            if (max(neighbours[[j]]) > 1/xSpread){
+                scalingFactor <- (1/xSpread) / max(neighbours[[j]])
+            }else
+                scalingFactor <- 1
+        }
+
         #scale all neighbourhoods based on their density relative to the
         #densiest neighbourhood
-        if (relScaling)
+        if (relScaling == TRUE)
             relScalingFactor <- max(neighbours[[j]]) / maxNeighbours
 
         for (i in names(neighbours[[j]])){
 
-            #examine neighbourhoods with more than 1 samples
+            #examine neighbourhoods with more than 'neighbLimit' samples
             if (neighbours[[j]][i] > neighbLimit){
                 cur_bin <- yBins[ as.integer(i) : (as.integer(i) + 1)]
 
@@ -150,7 +187,7 @@ sinaplot <- function(x, groups, labels = NULL, plot = TRUE, relScaling = TRUE,
                     xMax <- mean(densities[[j]]$y[findInterval(densities[[j]]$x,
                                                                cur_bin) == 1])
                 else
-                    xMax <- xFraction*neighbours[[j]][i] / 2
+                    xMax <- xSpread*neighbours[[j]][i] / 2
 
                 xTranslate <- runif(neighbours[[j]][i], -xMax, xMax )
 

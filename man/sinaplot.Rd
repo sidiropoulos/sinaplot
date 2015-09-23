@@ -4,26 +4,41 @@
 \alias{sinaplot}
 \title{sinaplot}
 \usage{
-sinaplot(x, groups, labels = NULL, plot = TRUE, relScaling = T,
-  ypercentage = 0.02, xpercentage = 0.1, neighbLimit = 1, adjust = 1,
-  method = "neighbours", ...)
+sinaplot(x, groups, method = "density", relScaling = TRUE,
+  yFraction = 0.02, neighbLimit = 1, adjust = 3/4, xSpread = 0.1,
+  labels = NULL, plot = TRUE, ...)
 }
 \arguments{
 \item{x}{numeric vector of values to be plotted}
 
 \item{groups}{vector of length x}
 
-\item{labels}{optional}
-
-\item{plot}{logical. Default: TRUE}
-
-\item{neighbLimit}{blah blah}
-
-\item{adjust}{blah blah blah}
-
 \item{method}{blah blah blah blah}
 
-\item{...}{}
+\item{relScaling}{blah}
+
+\item{yFraction}{binning factor. The range of the values in \code{x} are
+binned in windows of length \code{(max(x) - min(x)) * yFraction}. Samples
+within the same bin belong to the same "neighbourhood".}
+
+\item{neighbLimit}{if the samples within the same y-axis bin are more than
+neighbLimit, the samples's X coordinates will be adjusted}
+
+\item{adjust}{adjusts the bandwidth of the density kernel when
+\code{method = "density"} (see \code{\link{density}}).}
+
+\item{xSpread}{tuning parameter that adjusts the spread of the samples within
+the same neighbourhood along the x-axis when \code{method = "neighbourhood"}.
+Accepts values between 0 and 1.}
+
+\item{labels}{optional arguments that controls the labels along the x-axis.
+Must be of length \code{unique(groups)}.}
+
+\item{plot}{logical. When TRUE the sinaplot is produced, otherwise the
+function returns the new sample coordinates. Default: TRUE}
+
+\item{...}{Arguments to be passed to methods, such as graphical parameters
+(see \code{\link{par}}.}
 }
 \value{
 blah blah blah blah
