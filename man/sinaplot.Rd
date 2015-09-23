@@ -4,18 +4,21 @@
 \alias{sinaplot}
 \title{sinaplot}
 \usage{
-sinaplot(x, groups, method = "density", relScaling = TRUE,
-  yFraction = 0.02, neighbLimit = 1, adjust = 3/4, xSpread = 0.1,
-  labels = NULL, plot = TRUE, ...)
+sinaplot(x, groups, method = "density", scale = TRUE, yFraction = 0.02,
+  neighbLimit = 1, adjust = 3/4, xSpread = 0.1, labels = NULL,
+  plot = TRUE, ...)
 }
 \arguments{
 \item{x}{numeric vector of values to be plotted}
 
 \item{groups}{vector of length x}
 
-\item{method}{blah blah blah blah}
+\item{method}{choose the method to spread the samples within the same
+neighbourhood along the x-axis. Available methods: "density",
+"neighbourhood". See \code{Details}.}
 
-\item{relScaling}{blah}
+\item{scale}{logical. When set to \code{TRUE} x-coordinate widths across all
+groups are scaled based on the densiest are in the plot. Default: \code{TRUE}}
 
 \item{yFraction}{binning factor. The range of the values in \code{x} are
 binned in windows of length \code{(max(x) - min(x)) * yFraction}. Samples
@@ -34,14 +37,16 @@ Accepts values between 0 and 1.}
 \item{labels}{optional arguments that controls the labels along the x-axis.
 Must be of length \code{unique(groups)}.}
 
-\item{plot}{logical. When TRUE the sinaplot is produced, otherwise the
-function returns the new sample coordinates. Default: TRUE}
+\item{plot}{logical. When \code{TRUE} the sinaplot is produced, otherwise the
+function returns the new sample coordinates. Default: \code{TRUE}}
 
 \item{...}{Arguments to be passed to methods, such as graphical parameters
-(see \code{\link{par}}.}
+(see \code{\link{par}}).}
 }
 \value{
-blah blah blah blah
+if \code{plot == FALSE} a list is returned containing a data.frame
+with the new sample coordinates and a vector of length x that corresponds to
+each sample's group.
 }
 \description{
 blah blah blah blah blah blah blah blah blah blah blah blah

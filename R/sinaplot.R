@@ -3,8 +3,11 @@
 #'
 #' @param x numeric vector of values to be plotted
 #' @param groups vector of length x
-#' @param method blah blah blah blah
-#' @param relScaling blah
+#' @param method choose the method to spread the samples within the same
+#' neighbourhood along the x-axis. Available methods: "density",
+#' "neighbourhood". See \code{Details}.
+#' @param scale logical. When set to \code{TRUE} x-coordinate widths across all
+#' groups are scaled based on the densiest are in the plot. Default: \code{TRUE}
 #' @param yFraction binning factor. The range of the values in \code{x} are
 #' binned in windows of length \code{(max(x) - min(x)) * yFraction}. Samples
 #' within the same bin belong to the same "neighbourhood".
@@ -17,21 +20,23 @@
 #' Accepts values between 0 and 1.
 #' @param labels optional arguments that controls the labels along the x-axis.
 #' Must be of length \code{unique(groups)}.
-#' @param plot logical. When TRUE the sinaplot is produced, otherwise the
-#' function returns the new sample coordinates. Default: TRUE
+#' @param plot logical. When \code{TRUE} the sinaplot is produced, otherwise the
+#' function returns the new sample coordinates. Default: \code{TRUE}
 #' @param ... Arguments to be passed to methods, such as graphical parameters
 #' (see \code{\link{par}}).
 #'
-#' @return blah blah blah blah
+#' @return if \code{plot == FALSE} a list is returned containing a data.frame
+#' with the new sample coordinates and a vector of length x that corresponds to
+#' each sample's group.
 #'
 #' @export
 
-sinaplot <- function(x, groups, method = "density", relScaling = TRUE,
+sinaplot <- function(x, groups, method = "density", scale = TRUE,
                      yFraction = 0.02, neighbLimit = 1, adjust = 3/4,
                      xSpread = 0.1, labels = NULL, plot = TRUE, ...)
 {
 
-    ###CHECK STUFF
+    ###Check input arguments
     if (length(x) != length(groups))
         stop("x and groups must be of the same length.")
 
@@ -54,12 +59,12 @@ sinaplot <- function(x, groups, method = "density", relScaling = TRUE,
         message("Available methods: 'density', 'neighbourhood'")
         method <- "density"
     }
-    ###END OF STUFF CHECKING
+    ###end
 
     yBins <- .binY(x, yFraction)
 
     #calculate new x coordinates
-    x <- .getXcoord(x, groups, yBins, xSpread, relScaling, neighbLimit,
+    x <- .getXcoord(x, groups, yBins, xSpread, scale, neighbLimit,
                     adjust, method)
 
     #number of groups
@@ -75,11 +80,25 @@ sinaplot <- function(x, groups, method = "density", relScaling = TRUE,
     x <- do.call(rbind, x)
 
     if (plot == TRUE){
-        plot(x, xaxt = "n", col = newGroups, ylab = "log2 expression", xlab = "",
-             xlim = c(0,(ngroups+1)), ...)
-        axis(1, at = 1:ngroups, labels = FALSE)
-        text(1:ngroups, par("usr")[3] - 0.4, srt = 45, labels = labs, adj = 1,
-             xpd = T)
+
+        if (suppressWarnings(require(ggplot2))) {
+            x$groups <- newGroups
+
+            p <- ggplot(aes(x = x, y = y, color = groups), data = x) +
+                geom_point()
+            p <- p + scale_x_discrete(limits = labs) +
+                theme(axis.text.x = element_text(angle = 45, hjust = 1))
+            p <- p + xlab("") + ylab("log2 expression") +  guides(color=FALSE)
+            p
+
+        } else {
+
+            plot(x, xaxt = "n", col = newGroups, ylab = "log2 expression",
+                 xlab = "", xlim = c(0,(ngroups+1)), ...)
+            axis(1, at = 1:ngroups, labels = FALSE)
+            text(1:ngroups, par("usr")[3] - 0.4, srt = 45, labels = labs,
+                 adj = 1, xpd = T)
+        }
     } else
         list(x, newGroups)
 }
@@ -100,7 +119,7 @@ sinaplot <- function(x, groups, method = "density", relScaling = TRUE,
     yBins
 }
 
-.getXcoord <- function(data, groups, yBins, xSpread, relScaling,
+.getXcoord <- function(data, groups, yBins, xSpread, scale,
                        neighbLimit, adjust, method){
 
     #number of groups
@@ -171,7 +190,7 @@ sinaplot <- function(x, groups, method = "density", relScaling = TRUE,
 
         #scale all neighbourhoods based on their density relative to the
         #densiest neighbourhood
-        if (relScaling == TRUE)
+        if (scale == TRUE)
             relScalingFactor <- max(neighbours[[j]]) / maxNeighbours
 
         for (i in names(neighbours[[j]])){
