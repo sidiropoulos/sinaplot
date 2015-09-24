@@ -14,7 +14,7 @@
 #' @param neighbLimit if the samples within the same y-axis bin are more than
 #' neighbLimit, the samples's X coordinates will be adjusted
 #' @param adjust adjusts the bandwidth of the density kernel when
-#' \code{method = "density"} (see \code{\link{density}}).
+#' \code{method = "density"} (see \code{\link[stats]{density}}).
 #' @param xSpread tuning parameter that adjusts the spread of the samples within
 #' the same neighbourhood along the x-axis when \code{method = "neighbourhood"}.
 #' Accepts values between 0 and 1.
@@ -25,9 +25,24 @@
 #' @param ... Arguments to be passed to methods, such as graphical parameters
 #' (see \code{\link{par}}).
 #'
-#' @return if \code{plot == FALSE} a list is returned containing a data.frame
+#' @details kati
+#' \itemize{
+#'  \item{\bold{"details"}: blah blah}
+#'  \item{"neighbourhood": blsd }
+#' }
+#' @return if \code{plot = FALSE} a list is returned containing a data.frame
 #' with the new sample coordinates and a vector of length x that corresponds to
 #' each sample's group.
+#'
+#' @examples
+#'
+#' x <- c(rnorm(200, 4, 1), rnorm(200, 5, 2), rnorm(200, 6, 1.5))
+#' groups <- c(rep("Cond1", 200), rep("Cond2", 200), rep("Cond3", 200))
+#'
+#' sinaplot(x, groups)
+#' sinaplot(x, groups, scale = FALSE)
+#' sinaplot(x, groups, scale = FALSE, adjust = 1/6)
+#' sinaplot(x, groups, scale = FALSE, adjust = 3)
 #'
 #' @export
 
@@ -81,14 +96,17 @@ sinaplot <- function(x, groups, method = "density", scale = TRUE,
 
     if (plot == TRUE){
 
-        if (suppressWarnings(require(ggplot2))) {
+        if (requireNamespace("ggplot2", quietly = TRUE)) {
+
             x$groups <- newGroups
 
-            p <- ggplot(aes(x = x, y = y, color = groups), data = x) +
-                geom_point()
-            p <- p + scale_x_discrete(limits = labs) +
-                theme(axis.text.x = element_text(angle = 45, hjust = 1))
-            p <- p + xlab("") + ylab("log2 expression") +  guides(color=FALSE)
+            p <- ggplot2::ggplot(ggplot2::aes(x = x, y = y, color = groups),
+                                 data = x) + ggplot2::geom_point()
+            p <- p + ggplot2::scale_x_discrete(limits = labs) +
+                ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45,
+                                                                   hjust = 1))
+            p <- p + ggplot2::xlab("") + ggplot2::ylab("log2 expression") +
+                ggplot2::guides(color=FALSE)
             p
 
         } else {
@@ -174,9 +192,10 @@ sinaplot <- function(x, groups, method = "density", scale = TRUE,
 
     for (j in 1:ngroups){
 
+        #confine the sample
         if (method == "density"){
-            if (max(densities[[j]]$y) > 0.45)
-                scalingFactor <- 0.45 / max(densities[[j]]$y)
+            if (max(densities[[j]]$y) > 0.48)
+                scalingFactor <- 0.48 / max(densities[[j]]$y)
             else
                 scalingFactor <- 1
         }else {
@@ -202,14 +221,17 @@ sinaplot <- function(x, groups, method = "density", scale = TRUE,
                 #find samples in the current bin and translate their X coord.
                 points <- findInterval(xyArray[[j]]$y, cur_bin) == 1
 
+                #compute the border margin for the current bin
                 if (method == "density")
                     xMax <- mean(densities[[j]]$y[findInterval(densities[[j]]$x,
                                                                cur_bin) == 1])
                 else
                     xMax <- xSpread*neighbours[[j]][i] / 2
 
+                #assign the samples uniformely within the specified range
                 xTranslate <- runif(neighbours[[j]][i], -xMax, xMax )
 
+                #store new x coordinates
                 xyArray[[j]]$x[points] <- xyArray[[j]]$x[points] +
                     (xTranslate * scalingFactor * relScalingFactor)
             }

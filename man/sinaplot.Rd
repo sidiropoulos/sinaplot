@@ -28,7 +28,7 @@ within the same bin belong to the same "neighbourhood".}
 neighbLimit, the samples's X coordinates will be adjusted}
 
 \item{adjust}{adjusts the bandwidth of the density kernel when
-\code{method = "density"} (see \code{\link{density}}).}
+\code{method = "density"} (see \code{\link[stats]{density}}).}
 
 \item{xSpread}{tuning parameter that adjusts the spread of the samples within
 the same neighbourhood along the x-axis when \code{method = "neighbourhood"}.
@@ -44,11 +44,27 @@ function returns the new sample coordinates. Default: \code{TRUE}}
 (see \code{\link{par}}).}
 }
 \value{
-if \code{plot == FALSE} a list is returned containing a data.frame
+if \code{plot = FALSE} a list is returned containing a data.frame
 with the new sample coordinates and a vector of length x that corresponds to
 each sample's group.
 }
 \description{
 blah blah blah blah blah blah blah blah blah blah blah blah
+}
+\details{
+kati
+\itemize{
+ \item{\bold{"details"}: blah blah}
+ \item{"neighbourhood": blsd }
+}
+}
+\examples{
+x <- c(rnorm(200, 4, 1), rnorm(200, 5, 2), rnorm(200, 6, 1.5))
+groups <- c(rep("Cond1", 200), rep("Cond2", 200), rep("Cond3", 200))
+
+sinaplot(x, groups)
+sinaplot(x, groups, scale = FALSE)
+sinaplot(x, groups, scale = FALSE, adjust = 1/6)
+sinaplot(x, groups, scale = FALSE, adjust = 3)
 }
 
