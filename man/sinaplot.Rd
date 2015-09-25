@@ -4,14 +4,28 @@
 \alias{sinaplot}
 \title{sinaplot}
 \usage{
-sinaplot(x, groups, method = "density", scale = TRUE, yFraction = 0.02,
-  neighbLimit = 1, adjust = 3/4, xSpread = 0.1, labels = NULL,
-  plot = TRUE, ...)
+sinaplot <- function(x,
+                     groups,
+                     method = "density",
+                     scale = TRUE,
+                     yFraction = 0.02,
+                     neighbLimit = 1,
+                     adjust = 3/4,
+                     xSpread = 0.1,
+                     labels = NULL,
+                     plot = TRUE,
+
+                     #Plot parameters
+                     main = "",
+                     bw = FALSE,
+                     shape = 16,
+                     size = 2,
+                     color = NULL)
 }
 \arguments{
-\item{x}{numeric vector of values to be plotted}
+\item{x}{numeric vector of values to be plotted.}
 
-\item{groups}{vector of length x}
+\item{groups}{vector of \code{length(x)}.}
 
 \item{method}{choose the method to spread the samples within the same
 neighbourhood along the x-axis. Available methods: "density",
@@ -25,7 +39,7 @@ binned in windows of length \code{(max(x) - min(x)) * yFraction}. Samples
 within the same bin belong to the same "neighbourhood".}
 
 \item{neighbLimit}{if the samples within the same y-axis bin are more than
-neighbLimit, the samples's X coordinates will be adjusted}
+neighbLimit, the samples's X coordinates will be adjusted.}
 
 \item{adjust}{adjusts the bandwidth of the density kernel when
 \code{method = "density"} (see \code{\link[stats]{density}}).}
@@ -40,8 +54,19 @@ Must be of length \code{unique(groups)}.}
 \item{plot}{logical. When \code{TRUE} the sinaplot is produced, otherwise the
 function returns the new sample coordinates. Default: \code{TRUE}}
 
-\item{...}{Arguments to be passed to methods, such as graphical parameters
-(see \code{\link{par}}).}
+\item{main}{plot title}
+
+\item{bw}{logical. If \code{TRUE} a theme with white background and black
+gridlines is used. Default: FALSE}
+
+\item{shape}{single value or vector of \code{length(x)}. Controls the sample
+shape.}
+
+\item{size}{single value of vector of \code{length(x)}. Controls the sample
+size.}
+
+\item{color}{vector of \code{length(unique(groups))}. Controls the sample
+color of each group.}
 }
 \value{
 if \code{plot = FALSE} a list is returned containing a data.frame
@@ -49,13 +74,29 @@ with the new sample coordinates and a vector of length x that corresponds to
 each sample's group.
 }
 \description{
-blah blah blah blah blah blah blah blah blah blah blah blah
+The sinaplot is a data visualization chart suitable for plotting
+any single variable in a multiclass dataset. It is an enhanced jitter strip
+chart, where the width of the jitter is controlled by the density
+distribution of the data within each class.
 }
 \details{
-kati
+There are two available ways to define the x-axis borders for the
+samples to spread within:
 \itemize{
- \item{\bold{"details"}: blah blah}
- \item{"neighbourhood": blsd }
+ \item{\code{method = "density"}
+
+  A density kernel is estimated along the y-axis for every sample group. The
+  borders are then defined by the density curve. Tuning parameter
+  \code{adjust} can be used to control the density bandwidth in the same way
+  it is used in \code{\link[stats]{density}}. }
+ \item{\code{method = "neighbourhood"}:
+
+ The borders are defined by the number of samples that 'live' in the same
+ neighbourhood and the parameter \code{xSpread} in the following fashion:
+
+ \code{xBorder = nsamples * xSpread}
+
+  }
 }
 }
 \examples{

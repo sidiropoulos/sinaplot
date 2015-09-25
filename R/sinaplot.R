@@ -1,8 +1,29 @@
 #' @title sinaplot
-#' @description blah blah blah blah blah blah blah blah blah blah blah blah
+#' @description The sinaplot is a data visualization chart suitable for plotting
+#' any single variable in a multiclass dataset. It is an enhanced jitter strip
+#' chart, where the width of the jitter is controlled by the density
+#' distribution of the data within each class.
 #'
-#' @param x numeric vector of values to be plotted
-#' @param groups vector of length x
+#' @usage sinaplot <- function(x,
+#'                      groups,
+#'                      method = "density",
+#'                      scale = TRUE,
+#'                      yFraction = 0.02,
+#'                      neighbLimit = 1,
+#'                      adjust = 3/4,
+#'                      xSpread = 0.1,
+#'                      labels = NULL,
+#'                      plot = TRUE,
+#'
+#'                      #Plot parameters
+#'                      main = "",
+#'                      bw = FALSE,
+#'                      shape = 16,
+#'                      size = 2,
+#'                      color = NULL)
+#'
+#' @param x numeric vector of values to be plotted.
+#' @param groups vector of \code{length(x)}.
 #' @param method choose the method to spread the samples within the same
 #' neighbourhood along the x-axis. Available methods: "density",
 #' "neighbourhood". See \code{Details}.
@@ -12,7 +33,7 @@
 #' binned in windows of length \code{(max(x) - min(x)) * yFraction}. Samples
 #' within the same bin belong to the same "neighbourhood".
 #' @param neighbLimit if the samples within the same y-axis bin are more than
-#' neighbLimit, the samples's X coordinates will be adjusted
+#' neighbLimit, the samples's X coordinates will be adjusted.
 #' @param adjust adjusts the bandwidth of the density kernel when
 #' \code{method = "density"} (see \code{\link[stats]{density}}).
 #' @param xSpread tuning parameter that adjusts the spread of the samples within
@@ -22,13 +43,33 @@
 #' Must be of length \code{unique(groups)}.
 #' @param plot logical. When \code{TRUE} the sinaplot is produced, otherwise the
 #' function returns the new sample coordinates. Default: \code{TRUE}
-#' @param ... Arguments to be passed to methods, such as graphical parameters
-#' (see \code{\link{par}}).
+#' @param main plot title
+#' @param bw logical. If \code{TRUE} a theme with white background and black
+#' gridlines is used. Default: FALSE
+#' @param shape single value or vector of \code{length(x)}. Controls the sample
+#' shape.
+#' @param size single value of vector of \code{length(x)}. Controls the sample
+#' size.
+#' @param color vector of \code{length(unique(groups))}. Controls the sample
+#' color of each group.
 #'
-#' @details kati
+#' @details There are two available ways to define the x-axis borders for the
+#' samples to spread within:
 #' \itemize{
-#'  \item{\bold{"details"}: blah blah}
-#'  \item{"neighbourhood": blsd }
+#'  \item{\code{method = "density"}
+#'
+#'   A density kernel is estimated along the y-axis for every sample group. The
+#'   borders are then defined by the density curve. Tuning parameter
+#'   \code{adjust} can be used to control the density bandwidth in the same way
+#'   it is used in \code{\link[stats]{density}}. }
+#'  \item{\code{method = "neighbourhood"}:
+#'
+#'  The borders are defined by the number of samples that 'live' in the same
+#'  neighbourhood and the parameter \code{xSpread} in the following fashion:
+#'
+#'  \code{xBorder = nsamples * xSpread}
+#'
+#'   }
 #' }
 #' @return if \code{plot = FALSE} a list is returned containing a data.frame
 #' with the new sample coordinates and a vector of length x that corresponds to
@@ -44,11 +85,27 @@
 #' sinaplot(x, groups, scale = FALSE, adjust = 1/6)
 #' sinaplot(x, groups, scale = FALSE, adjust = 3)
 #'
+#' @import ggplot2
 #' @export
 
-sinaplot <- function(x, groups, method = "density", scale = TRUE,
-                     yFraction = 0.02, neighbLimit = 1, adjust = 3/4,
-                     xSpread = 0.1, labels = NULL, plot = TRUE, ...)
+sinaplot <- function(x,
+                     groups,
+                     method = "density",
+                     scale = TRUE,
+                     yFraction = 0.02,
+                     neighbLimit = 1,
+                     adjust = 3/4,
+                     xSpread = 0.1,
+                     labels = NULL,
+                     plot = TRUE,
+
+                     #Plot parameters
+                     main = "",
+                     bw = FALSE,
+                     shape = 16,
+                     size = 2,
+                     color = NULL
+                     )
 {
 
     ###Check input arguments
@@ -96,27 +153,24 @@ sinaplot <- function(x, groups, method = "density", scale = TRUE,
 
     if (plot == TRUE){
 
-        if (requireNamespace("ggplot2", quietly = TRUE)) {
+        x$groups <- newGroups
 
-            x$groups <- newGroups
+        p <- ggplot2::ggplot(ggplot2::aes(x = x, y = y, color = groups),
+                             data = x) + ggplot2::geom_point(size = size, shape = shape)
 
-            p <- ggplot2::ggplot(ggplot2::aes(x = x, y = y, color = groups),
-                                 data = x) + ggplot2::geom_point()
-            p <- p + ggplot2::scale_x_discrete(limits = labs) +
-                ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45,
-                                                                   hjust = 1))
-            p <- p + ggplot2::xlab("") + ggplot2::ylab("log2 expression") +
-                ggplot2::guides(color=FALSE)
-            p
+        if (bw)
+            p <- p + ggplot2::theme_bw()
 
-        } else {
+        p <- p + ggplot2::scale_x_discrete(limits = labs) +
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45,
+                                                               hjust = 1))
+        p <- p + ggplot2::xlab("") + ggplot2::ylab("log2 expression") +
+            ggplot2::guides(color=FALSE) + ggplot2::ggtitle(main)
 
-            plot(x, xaxt = "n", col = newGroups, ylab = "log2 expression",
-                 xlab = "", xlim = c(0,(ngroups+1)), ...)
-            axis(1, at = 1:ngroups, labels = FALSE)
-            text(1:ngroups, par("usr")[3] - 0.4, srt = 45, labels = labs,
-                 adj = 1, xpd = T)
-        }
+        if (!is.null(color))
+            p <- p + ggplot2::scale_color_manual(values = color)
+        p
+
     } else
         list(x, newGroups)
 }
