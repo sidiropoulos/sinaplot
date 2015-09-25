@@ -17,6 +17,7 @@
 #'
 #'                      #Plot parameters
 #'                      main = "",
+#'                      ylab = "",
 #'                      bw = FALSE,
 #'                      shape = 16,
 #'                      size = 2,
@@ -44,6 +45,7 @@
 #' @param plot logical. When \code{TRUE} the sinaplot is produced, otherwise the
 #' function returns the new sample coordinates. Default: \code{TRUE}
 #' @param main plot title
+#' @param ylab Y axis title
 #' @param bw logical. If \code{TRUE} a theme with white background and black
 #' gridlines is used. Default: FALSE
 #' @param shape single value or vector of \code{length(x)}. Controls the sample
@@ -101,6 +103,7 @@ sinaplot <- function(x,
 
                      #Plot parameters
                      main = "",
+                     ylab = "",
                      bw = FALSE,
                      shape = 16,
                      size = 2,
@@ -164,7 +167,7 @@ sinaplot <- function(x,
         p <- p + ggplot2::scale_x_discrete(limits = labs) +
             ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45,
                                                                hjust = 1))
-        p <- p + ggplot2::xlab("") + ggplot2::ylab("log2 expression") +
+        p <- p + ggplot2::xlab("") + ggplot2::ylab(ylab) +
             ggplot2::guides(color=FALSE) + ggplot2::ggtitle(main)
 
         if (!is.null(color))

@@ -17,6 +17,7 @@ sinaplot <- function(x,
 
                      #Plot parameters
                      main = "",
+                     ylab = "",
                      bw = FALSE,
                      shape = 16,
                      size = 2,
@@ -55,6 +56,8 @@ Must be of length \code{unique(groups)}.}
 function returns the new sample coordinates. Default: \code{TRUE}}
 
 \item{main}{plot title}
+
+\item{ylab}{Y axis title}
 
 \item{bw}{logical. If \code{TRUE} a theme with white background and black
 gridlines is used. Default: FALSE}
