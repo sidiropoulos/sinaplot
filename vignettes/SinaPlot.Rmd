@@ -43,7 +43,8 @@ sinaplot(x, groups)
 
 ### Blood 
 
-We use a cohort of 2095 AML, ALL and healthy bone marrow samples to illustrate the power of **sinaplot**.
+We use a cohort of 2095 AML, ALL and healthy bone marrow samples to illustrate 
+some of the strengths  of **sinaplot**.
 
 ```{r blood, echo=FALSE, results='asis'}
 knitr::kable(head(blood, 10))
@@ -75,59 +76,12 @@ sinaplot(blood$value, blood$type, size = 1, method = "neighbourhood",
 
 ## Comparison
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-```{r comparison, fig.align='center',fig.width=7, fig.height=4}
-# library(gridExtra)
-# df <- blood[c("AML normal", "CLL", "T-ALL", "MDS", "Healthy bone marrow"), ]
-# 
-# p1 <- ggplot(aes(type, value, fill = type),data = df) + geom_boxplot() 
-# p1 <- p1 + theme(axis.text.x=element_text(angle = 45, hjust = 1)) + guides(fill=FALSE)
-# p1 <- p1 + ylab("log2 expression") + xlab("") + ggtitle("Box and Whisker")
-# 
-# p2 <- ggplot(aes(type, value, fill = type),data = df) + geom_violin() 
-# p2 <- p2 + theme(axis.text.x=element_text(angle = 45, hjust = 1)) + guides(fill=FALSE) 
-# p2 <- p2 + ylab("") + xlab("") + ggtitle("Violin")
-# 
-# p3 <- sinaplot(df$value, df$type, size = 1.5) + ggtitle("Sina")
-# 
-# grid.arrange(p1, p2, p3, ncol = 3)
-```
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-## Test
+Using a subset of the ```blood``` data set we compare sinaplot with boxplot,
+violinplot and beeswarm, and show how our package integrates features from these
+plotting methods to achieve truthful and yet simple representation of multiclass
+single variable data.
+    ![](../inst/figures/comparison.png)
     
-Kati gia to spiti:
-    
-    ![](../inst/figures/comparison.pdf)
-
 ## Session info
 
 ```{r sessionInfo}
