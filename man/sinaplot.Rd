@@ -4,24 +4,10 @@
 \alias{sinaplot}
 \title{sinaplot}
 \usage{
-sinaplot <- function(x,
-                     groups,
-                     method = "density",
-                     scale = TRUE,
-                     yFraction = 0.02,
-                     neighbLimit = 1,
-                     adjust = 3/4,
-                     xSpread = 0.1,
-                     labels = NULL,
-                     plot = TRUE,
-
-                     #Plot parameters
-                     main = "",
-                     ylab = "",
-                     bw = FALSE,
-                     shape = 16,
-                     size = 2,
-                     color = NULL)
+sinaplot(x, groups, method = "density", scale = TRUE, yFraction = 0.02,
+  neighbLimit = 1, adjust = 3/4, xSpread = 0.1, labels = NULL,
+  plot = TRUE, main = "", ylab = "", bw = FALSE, shape = 16,
+  size = 2, color = NULL)
 }
 \arguments{
 \item{x}{numeric vector of values to be plotted.}
@@ -110,5 +96,10 @@ sinaplot(x, groups)
 sinaplot(x, groups, scale = FALSE)
 sinaplot(x, groups, scale = FALSE, adjust = 1/6)
 sinaplot(x, groups, scale = FALSE, adjust = 3)
+
+#blood
+data("blood", package = "sinaplot")
+sinaplot(blood$value, blood$type, method = "neighbourhood")
+sinaplot(blood$value, blood$type, method = "neighbourhood", scale = FALSE)
 }
 

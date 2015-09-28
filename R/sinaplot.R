@@ -4,25 +4,6 @@
 #' chart, where the width of the jitter is controlled by the density
 #' distribution of the data within each class.
 #'
-#' @usage sinaplot <- function(x,
-#'                      groups,
-#'                      method = "density",
-#'                      scale = TRUE,
-#'                      yFraction = 0.02,
-#'                      neighbLimit = 1,
-#'                      adjust = 3/4,
-#'                      xSpread = 0.1,
-#'                      labels = NULL,
-#'                      plot = TRUE,
-#'
-#'                      #Plot parameters
-#'                      main = "",
-#'                      ylab = "",
-#'                      bw = FALSE,
-#'                      shape = 16,
-#'                      size = 2,
-#'                      color = NULL)
-#'
 #' @param x numeric vector of values to be plotted.
 #' @param groups vector of \code{length(x)}.
 #' @param method choose the method to spread the samples within the same
@@ -86,6 +67,11 @@
 #' sinaplot(x, groups, scale = FALSE)
 #' sinaplot(x, groups, scale = FALSE, adjust = 1/6)
 #' sinaplot(x, groups, scale = FALSE, adjust = 3)
+#'
+#' #blood
+#' data("blood", package = "sinaplot")
+#' sinaplot(blood$value, blood$type, method = "neighbourhood")
+#' sinaplot(blood$value, blood$type, method = "neighbourhood", scale = FALSE)
 #'
 #' @import ggplot2
 #' @export
