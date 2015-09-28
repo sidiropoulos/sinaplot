@@ -1,0 +1,136 @@
+---
+title: "SinaPlot: an enhanced chart for simple and truthful representation of
+single observations over multiple classes"
+author: "Nikos Sidiropoulos, Sina Hadi Sohi, Nicolas Jean-Pierre Philipe Rapin, 
+Frederik Otzen Bagger"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SinaPlot}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+##Introduction
+
+Recent developments in data science, in particular computational biology, often 
+integrate data from several sources, over diverse experiments, or databases 
+leaves a challenge of truthfully visualize data where the number of data points 
+vary between classes. Plot types like bar charts, violin plot, strip charts or 
+box-and-whiskers plots can provide visual information about mean/median, 
+variance of the data, number of data points or density distribution of data; 
+but only pairs of plots or dense overlays of these plot types will provide all 
+the relevant information. To aid the presentation of datasets with differing 
+sample size we have developed a new type of plot overcoming limitations of 
+current standards visualization charts. 
+
+**sinaplot** is inspired by the strip chart and the violin plot. By letting the 
+normalized density of points restrict the jitter along the x-axis the plot 
+displays the same contour as a violin plot, but resemble a simple strip chart 
+for small number of data points. In this way the plot conveys information of 
+both the number of data points, the density distribution, outliers and spread 
+in a very simple, comprehensible and condensed format.
+
+## Examples
+
+```{r example, fig.align='center', fig.width=5, fig.height=4}
+x <- c(rnorm(200, 4, 1), rnorm(200, 5, 2), rnorm(200, 6, 1.5))
+groups <- c(rep("Cond1", 200), rep("Cond2", 200), rep("Cond3", 200))
+
+library(sinaplot)
+sinaplot(x, groups)
+```
+
+### Blood 
+
+We use a cohort of 2095 AML, ALL and healthy bone marrow samples to illustrate the power of **sinaplot**.
+
+```{r blood, echo=FALSE, results='asis'}
+knitr::kable(head(blood, 10))
+```
+
+---
+```{r bloodDensity, fig.align='center', fig.height=4, fig.width=7}
+sinaplot(blood$value, blood$type, size = 1)
+```
+
+---
+
+Using the `method = "neighbourhood"` to compute the borders we get a less smooth 
+spread of the samples due to the absence of the kernel density estimate.
+
+```{r bloodNeighb, fig.align='center', fig.height=4, fig.width=7}
+sinaplot(blood$value, blood$type, size = 1, method = "neighbourhood")
+```
+
+---
+
+Setting the argument `scale = FALSE we` turn off the relative scaling of all the 
+sample types based on the one with the highest density.
+
+```{r bloodScaleOff, fig.align='center', fig.height=4, fig.width=7}
+sinaplot(blood$value, blood$type, size = 1, method = "neighbourhood", 
+         scale = FALSE)
+```
+
+## Comparison
+
+Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+
+```{r comparison, fig.align='center',fig.width=7, fig.height=4}
+# library(gridExtra)
+# df <- blood[c("AML normal", "CLL", "T-ALL", "MDS", "Healthy bone marrow"), ]
+# 
+# p1 <- ggplot(aes(type, value, fill = type),data = df) + geom_boxplot() 
+# p1 <- p1 + theme(axis.text.x=element_text(angle = 45, hjust = 1)) + guides(fill=FALSE)
+# p1 <- p1 + ylab("log2 expression") + xlab("") + ggtitle("Box and Whisker")
+# 
+# p2 <- ggplot(aes(type, value, fill = type),data = df) + geom_violin() 
+# p2 <- p2 + theme(axis.text.x=element_text(angle = 45, hjust = 1)) + guides(fill=FALSE) 
+# p2 <- p2 + ylab("") + xlab("") + ggtitle("Violin")
+# 
+# p3 <- sinaplot(df$value, df$type, size = 1.5) + ggtitle("Sina")
+# 
+# grid.arrange(p1, p2, p3, ncol = 3)
+```
+
+## Styles
+
+The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+
+    output: 
+      rmarkdown::html_vignette:
+        css: mystyles.css
+
+## Figures
+
+The figure sizes have been customised so that you can easily put two images side-by-side. 
+
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+## More Examples
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+## Test
+    
+Kati gia to spiti:
+    
+    ![](../inst/figures/comparison.pdf)
+
+## Session info
+
+```{r sessionInfo}
+sessionInfo()
+```
+
