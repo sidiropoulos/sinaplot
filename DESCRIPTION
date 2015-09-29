@@ -9,7 +9,7 @@ Authors@R: c(person("Nikos", "Sidiropoulos", role = c("aut", "cre"),
     email = "sinasohi@gmail.com"), person("Frederik Otzen", "Bagger",
     role = "aut"), person("Nicolas", "Rapin", role = "aut",
     email = "nicolas.rapin@bric.ku.dk"))
-Description: The SinaPlot is a data visualization chart suitable for plotting
+Description: The sinaplot is a data visualization chart suitable for plotting
     any single variable in a multiclass dataset. It is an enhanced jitter strip
     chart, where the width of the jitter is controlled by the density
     distribution of the data within each class.
@@ -18,8 +18,7 @@ Depends:
     ggplot2(>= 1.0.1)
 Suggests:
     knitr,
-    RColorBrewer,
-    testthat
+    RColorBrewer
 Imports:
 License: GPL (>=2)
 LazyData: TRUE

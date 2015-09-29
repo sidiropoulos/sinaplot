@@ -30,28 +30,35 @@ library(beeswarm)
 sinaplot(df[,2], df[,1], ytitle = "log2 expression")
 
 
-p1 <- ggplot(aes(V1, V2, fill = V1),data = df) + geom_boxplot() 
-p1 <- p1 + theme(axis.text.x=element_blank()) + guides(fill=FALSE)
-p1 <- p1 + ylab("log2 expression") + xlab("") + ggtitle("Box and Whisker")
+p1 <- sinaplot(df[,2], df[,1], size = 1.5) + ggtitle("Sina") + theme_bw()
+p1 <- p1 + geom_point(colour="black") + theme(axis.text.x = element_blank()) + ylab("log2 expression")
 
-p2 <- ggplot(aes(V1, V2, fill = "grey"),data = df) + geom_violin() + theme_bw()
+p2 <- ggplot(aes(V1, V2),data = df) + geom_violin(fill = "grey80") + theme_bw()
 p2 <- p2 + theme(axis.text.x=element_blank()) + guides(fill=FALSE) 
 p2 <- p2 + ylab("") + xlab("") + ggtitle("Violin")
 
-p3 <- sinaplot(df[,2], df[,1], size = 1.5) + ggtitle("Sina") + theme_bw()
-p3 <- p3 + geom_point(colour="black") + theme(axis.text.x = element_blank()) + ylab("log2 expression")
+p3 <- ggplot(aes(V1, V2),data = df) + geom_boxplot(fill = "grey80") + theme_bw()
+p3 <- p3 + theme(axis.text.x=element_blank()) + guides(fill=FALSE)
+p3 <- p3 + ylab("log2 expression") + xlab("") + ggtitle("Box and Whisker")
 
 beeswarm2 <- beeswarm(df[,2] ~ df[,1])
 p4 <- ggplot(beeswarm2, aes(x, y)) + geom_point() + theme_bw()
 #p4 <- ggplot(beeswarm2, aes(x, y)) + geom_point(aes(colour = df$V1)) + scale_x_discrete(limits = labels)
 p4 <- p4 + theme(axis.text.x = element_blank()) + guides(colour=FALSE) 
-p4 <- p4 + ylab("") + xlab("") + ggtitle("Bee Swarm")
+p4 <- p4 + ylab("") + xlab("") + ggtitle("Bee Swarm") + xlim(c(0.5,5.5))
 
-p5 <- ggplot(dfjitter, aes(x, y)) + geom_point()
+p5 <- ggplot(df, aes(V1, V2)) + geom_jitter() + theme_bw()
+p5 <- p5 + theme(axis.text.x=element_text()) + guides(fill=FALSE) + scale_x_discrete(limits = labels)
+p5 <- p5 + ylab("log2 expression") + xlab("") + ggtitle("Jitter")
+
+p6 <- ggplot(df, aes(V1, V2)) + geom_point() + theme_bw()
+p6 <- p6 + theme(axis.text.x=element_text()) + guides(fill=FALSE) + scale_x_discrete(limits = labels)
+p6 <- p6 + ylab("") + xlab("") + ggtitle("Stripchart")
 
 
 pdf("inst/figures/comparison.pdf", width = 12)
-png("inst/figures/comparison.png")
-grid.arrange(p1, p2, p4, p3, ncol = 2)
+png("inst/figures/comparison.png", width = 650, height = 800, res = 72)
+#grid.arrange(p1, p2, p4, p3, ncol = 2)
+grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
 dev.off()
 df[,1] <- factor(df[,1], levels = unique(df[,1]))

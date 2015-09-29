@@ -1,12 +1,12 @@
 ---
-title: "SinaPlot: an enhanced chart for simple and truthful representation of
+title: "sinaplot: an enhanced chart for simple and truthful representation of
 single observations over multiple classes"
 author: "Nikos Sidiropoulos, Sina Hadi Sohi, Nicolas Jean-Pierre Philipe Rapin, 
 Frederik Otzen Bagger"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{SinaPlot}
+  %\VignetteIndexEntry{sinaplot}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -76,9 +76,9 @@ sinaplot(blood$value, blood$type, size = 1, method = "neighbourhood",
 
 ## Comparison
 
-Using a subset of the ```blood``` data set we compare sinaplot with boxplot,
-violinplot and beeswarm, and show how our package integrates features from these
-plotting methods to achieve truthful and yet simple representation of multiclass
+Using a subset of the ```blood``` dataset we compare sinaplot with 5 popular 
+plotting strategies, and show how our package integrates features from these
+methods to achieve truthful and yet simple representation of multiclass
 single variable data.
     ![](../inst/figures/comparison.png)
     
