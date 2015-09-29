@@ -1,17 +1,15 @@
 ---
-title: "sinaplot: an enhanced chart for simple and truthful representation of
-single observations over multiple classes"
-author: "Nikos Sidiropoulos, Sina Hadi Sohi, Nicolas Jean-Pierre Philipe Rapin, 
-Frederik Otzen Bagger"
-date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{sinaplot}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+title: 'sinaplot: an enhanced chart for simple and truthful representation of single
+  observations over multiple classes'
+author: Nikos Sidiropoulos, Sina Hadi Sohi, Nicolas Jean-Pierre Philipe Rapin, Frederik
+  Otzen Bagger
+date: '`r Sys.Date()`'
+output: html_document
+vignette: |
+  %\VignetteIndexEntry{sinaplot} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
 ---
 
-##Introduction
+## Introduction
 
 Recent developments in data science, in particular computational biology, often 
 integrate data from several sources, over diverse experiments, or databases 
@@ -51,8 +49,8 @@ knitr::kable(head(blood, 10))
 ```
 
 ---
-```{r bloodDensity, fig.align='center', fig.height=4, fig.width=7}
-sinaplot(blood$value, blood$type, size = 1)
+```{r bloodDensity, fig.align='center', fig.height=6, fig.width=7}
+sinaplot(blood$value, blood$type)
 ```
 
 ---
@@ -60,8 +58,8 @@ sinaplot(blood$value, blood$type, size = 1)
 Using the `method = "neighbourhood"` to compute the borders we get a less smooth 
 spread of the samples due to the absence of the kernel density estimate.
 
-```{r bloodNeighb, fig.align='center', fig.height=4, fig.width=7}
-sinaplot(blood$value, blood$type, size = 1, method = "neighbourhood")
+```{r bloodNeighb, fig.align='center', fig.height=6, fig.width=7}
+sinaplot(blood$value, blood$type, method = "neighbourhood")
 ```
 
 ---
@@ -69,8 +67,8 @@ sinaplot(blood$value, blood$type, size = 1, method = "neighbourhood")
 Setting the argument `scale = FALSE we` turn off the relative scaling of all the 
 sample types based on the one with the highest density.
 
-```{r bloodScaleOff, fig.align='center', fig.height=4, fig.width=7}
-sinaplot(blood$value, blood$type, size = 1, method = "neighbourhood", 
+```{r bloodScaleOff, fig.align='center', fig.height=6, fig.width=7}
+sinaplot(blood$value, blood$type, method = "neighbourhood", 
          scale = FALSE)
 ```
 
