@@ -4,10 +4,10 @@
 \alias{sinaplot}
 \title{sinaplot}
 \usage{
-sinaplot(x, groups, method = "density", scale = TRUE, yFraction = 0.02,
-  neighbLimit = 1, adjust = 3/4, xSpread = 0.1, labels = NULL,
-  plot = TRUE, main = "", ylab = "", bw = FALSE, shape = 16,
-  size = 2, color = NULL)
+sinaplot(x, groups, method = "density", groupwiseScale = TRUE,
+  yFraction = 0.02, neighbLimit = 1, adjust = 3/4, xSpread = 0.1,
+  labels = NULL, plot = TRUE, main = "", ylab = "", bw = FALSE,
+  shape = 16, size = 2, color = NULL)
 }
 \arguments{
 \item{x}{numeric vector of values to be plotted.}
@@ -18,7 +18,7 @@ sinaplot(x, groups, method = "density", scale = TRUE, yFraction = 0.02,
 neighbourhood along the x-axis. Available methods: "density",
 "neighbourhood". See \code{Details}.}
 
-\item{scale}{logical. When set to \code{TRUE} x-coordinate widths across all
+\item{groupwiseScale}{logical. When set to \code{TRUE} x-coordinate widths across all
 groups are scaled based on the densiest are in the plot. Default: \code{TRUE}}
 
 \item{yFraction}{binning factor. The range of the values in \code{x} are
@@ -93,13 +93,13 @@ x <- c(rnorm(200, 4, 1), rnorm(200, 5, 2), rnorm(200, 6, 1.5))
 groups <- c(rep("Cond1", 200), rep("Cond2", 200), rep("Cond3", 200))
 
 sinaplot(x, groups)
-sinaplot(x, groups, scale = FALSE)
-sinaplot(x, groups, scale = FALSE, adjust = 1/6)
-sinaplot(x, groups, scale = FALSE, adjust = 3)
+sinaplot(x, groups, groupwiseScale = FALSE)
+sinaplot(x, groups, groupwiseScale = FALSE, adjust = 1/6)
+sinaplot(x, groups, groupwiseScale = FALSE, adjust = 3)
 
 #blood
 data("blood", package = "sinaplot")
 sinaplot(blood$value, blood$type, method = "neighbourhood")
-sinaplot(blood$value, blood$type, method = "neighbourhood", scale = FALSE)
+sinaplot(blood$value, blood$type, method = "neighbourhood", groupwiseScale = FALSE)
 }
 

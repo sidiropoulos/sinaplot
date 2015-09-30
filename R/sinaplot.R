@@ -9,7 +9,7 @@
 #' @param method choose the method to spread the samples within the same
 #' neighbourhood along the x-axis. Available methods: "density",
 #' "neighbourhood". See \code{Details}.
-#' @param scale logical. When set to \code{TRUE} x-coordinate widths across all
+#' @param groupwiseScale logical. When set to \code{TRUE} x-coordinate widths across all
 #' groups are scaled based on the densiest are in the plot. Default: \code{TRUE}
 #' @param yFraction binning factor. The range of the values in \code{x} are
 #' binned in windows of length \code{(max(x) - min(x)) * yFraction}. Samples
@@ -64,14 +64,14 @@
 #' groups <- c(rep("Cond1", 200), rep("Cond2", 200), rep("Cond3", 200))
 #'
 #' sinaplot(x, groups)
-#' sinaplot(x, groups, scale = FALSE)
-#' sinaplot(x, groups, scale = FALSE, adjust = 1/6)
-#' sinaplot(x, groups, scale = FALSE, adjust = 3)
+#' sinaplot(x, groups, groupwiseScale = FALSE)
+#' sinaplot(x, groups, groupwiseScale = FALSE, adjust = 1/6)
+#' sinaplot(x, groups, groupwiseScale = FALSE, adjust = 3)
 #'
 #' #blood
 #' data("blood", package = "sinaplot")
 #' sinaplot(blood$value, blood$type, method = "neighbourhood")
-#' sinaplot(blood$value, blood$type, method = "neighbourhood", scale = FALSE)
+#' sinaplot(blood$value, blood$type, method = "neighbourhood", groupwiseScale = FALSE)
 #'
 #' @import ggplot2
 #' @export
@@ -79,7 +79,7 @@
 sinaplot <- function(x,
                      groups,
                      method = "density",
-                     scale = TRUE,
+                     groupwiseScale = TRUE,
                      yFraction = 0.02,
                      neighbLimit = 1,
                      adjust = 3/4,
@@ -125,7 +125,7 @@ sinaplot <- function(x,
     yBins <- .binY(x, yFraction)
 
     #calculate new x coordinates
-    x <- .getXcoord(x, groups, yBins, xSpread, scale, neighbLimit,
+    x <- .getXcoord(x, groups, yBins, xSpread, groupwiseScale, neighbLimit,
                     adjust, method)
 
     #number of groups
@@ -180,7 +180,7 @@ sinaplot <- function(x,
     yBins
 }
 
-.getXcoord <- function(data, groups, yBins, xSpread, scale,
+.getXcoord <- function(data, groups, yBins, xSpread, groupwiseScale,
                        neighbLimit, adjust, method){
 
     #number of groups
@@ -252,7 +252,7 @@ sinaplot <- function(x,
 
         #scale all neighbourhoods based on their density relative to the
         #densiest neighbourhood
-        if (scale == TRUE)
+        if (groupwiseScale == TRUE)
             relScalingFactor <- max(neighbours[[j]]) / maxNeighbours
 
         for (i in names(neighbours[[j]])){

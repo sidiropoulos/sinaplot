@@ -64,12 +64,12 @@ sinaplot(blood$value, blood$type, method = "neighbourhood")
 
 ---
 
-Setting the argument `scale = FALSE we` turn off the relative scaling of all the 
+Setting the argument `groupwiseScale = FALSE we` turn off the relative scaling of all the 
 sample types based on the one with the highest density.
 
 ```{r bloodScaleOff, fig.align='center', fig.height=6, fig.width=7}
 sinaplot(blood$value, blood$type, method = "neighbourhood", 
-         scale = FALSE)
+         groupwiseScale = FALSE)
 ```
 
 ## Comparison
