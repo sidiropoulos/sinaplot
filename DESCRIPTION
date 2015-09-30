@@ -6,9 +6,14 @@ Version: 0.1.0
 Date: 2015-09-20
 Authors@R: c(person("Nikos", "Sidiropoulos", role = c("aut", "cre"),
     email = "nikos.sidiro@gmail.com"), person("Sina Hadi", "Sohi", role = "aut",
-    email = "sinasohi@gmail.com"), person("Frederik Otzen", "Bagger",
-    role = "aut"), person("Nicolas", "Rapin", role = "aut",
-    email = "nicolas.rapin@bric.ku.dk"))
+    email = "sinasohi@gmail.com"), person("Nicolas Jean-Pierre Philipe",
+    "Rapin", role = "aut", email = "nicolas.rapin@bric.ku.dk"),
+    person("Frederik Otzen", "Bagger", role = "aut"))
+Author: Nikos Sidiropoulos [aut, cre],
+    Sina Hadi Hosi [aut],
+    Nicolas Jean-Pierre Philipe Rapin [aut],
+    Frederik Otzen Bagger [aut]
+Maintainer: Nikos Sidiropoulos <nikos.sidiro@gmail.com>
 Description: The sinaplot is a data visualization chart suitable for plotting
     any single variable in a multiclass dataset. It is an enhanced jitter strip
     chart, where the width of the jitter is controlled by the density
