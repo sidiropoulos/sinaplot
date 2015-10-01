@@ -56,9 +56,62 @@ p6 <- p6 + theme(axis.text.x=element_text()) + guides(fill=FALSE) + scale_x_disc
 p6 <- p6 + ylab("") + xlab("") + ggtitle("Stripchart")
 
 
-pdf("inst/figures/comparison.pdf", width = 12)
+pdf("inst/figures/comparison.pdf", width = 10)
 png("inst/figures/comparison.png", width = 650, height = 800, res = 72)
 #grid.arrange(p1, p2, p4, p3, ncol = 2)
 grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
 dev.off()
 df[,1] <- factor(df[,1], levels = unique(df[,1]))
+
+######################################
+library(sinaplot)
+data(blood)
+
+a <- data$value[data$type == "CLL"]
+dens <- density(a)
+
+yFraction <- 0.04
+
+window_size <- (max(a) - min(a)) * yFraction
+
+yBins <- c()
+for (i in 0:ceiling(1/yFraction)) {
+    yBins <- c(yBins, ymin + i * window_size)
+}
+
+par(mfrow=c(1,3))
+plot(rep(1, length(a)), a, xlim = c(0,2), ylim = c(4,10), ylab = "", xlab = "",
+     xaxt = "n", yaxt = "n", bty="n", pch = 20)
+points(dens$y + 1, dens$x, type="l")
+points(-dens$y + 1, dens$x, type="l")
+
+abline(h = yBins, lty = 2, lwd = 0.5)
+axis(1, at = seq(0, 2, 0.5), labels = FALSE)
+axis(2, at = c(4,6,8,10), labels = FALSE)
+
+b <- rep(1, length(a))
+p <- findInterval(a, yBins[10:11]) == 1
+
+cur_bin <- yBins[10:11]
+xMax <-mean(dens$y[findInterval(dens$x, cur_bin)==1])
+xTranslate <- runif(sum(p), -xMax, xMax )
+b[p] <- b[p] + xTranslate
+
+plot(b, a, xlim = c(0,2), ylim = c(4,10), ylab = "", xlab = "",
+     xaxt = "n", yaxt = "n", bty="n", pch = 20)
+points(dens$y + 1, dens$x, type="l")
+points(-dens$y + 1, dens$x, type="l")
+
+abline(h = yBins, lty = 2, lwd = 0.5)
+axis(1, at = seq(0, 2, 0.5), labels = FALSE)
+axis(2, at = c(4,6,8,10), labels = FALSE)
+
+c <- sinaplot(a, rep("CLL", length(a)), plot = FALSE)
+plot(c[[1]]$x, c[[1]]$y, xlim = c(0,2), ylim = c(4,10), ylab = "", xlab = "",
+     xaxt = "n", yaxt = "n", bty="n", pch = 20)
+points(dens$y + 1, dens$x, type="l")
+points(-dens$y + 1, dens$x, type="l")
+
+abline(h = yBins, lty = 2, lwd = 0.5)
+axis(1, at = seq(0, 2, 0.5), labels = FALSE)
+axis(2, at = c(4,6,8,10), labels = FALSE)
