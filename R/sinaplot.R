@@ -144,8 +144,9 @@ sinaplot <- function(x,
 
         x$groups <- newGroups
 
-        p <- ggplot2::ggplot(ggplot2::aes(x = x, y = y, color = groups),
-                             data = x) + ggplot2::geom_point(size = size, shape = shape)
+        p <- ggplot2::ggplot(ggplot2::aes_string(x = 'x', y = 'y',
+                                                 color = 'groups'), data = x) +
+            ggplot2::geom_point(size = size, shape = shape)
 
         if (bw)
             p <- p + ggplot2::theme_bw()
