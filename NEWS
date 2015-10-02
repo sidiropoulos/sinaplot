@@ -4,4 +4,5 @@ Changes in version 0.1.2 (2015-10-02)
 
 - NEWS file added
 - Changes in vignette compiling. knitr is added as the vignette builder in the DESCRIPTION FILE
-- Author name correction
+- Author details edited
+- Removed redundant "inst/temp.R" file

@@ -2,10 +2,10 @@
 \alias{sinaplot}
 \title{sinaplot}
 \usage{
-sinaplot(x, groups, method = "density", groupwiseScale = TRUE,
-  yFraction = 0.02, neighbLimit = 1, adjust = 3/4, xSpread = 0.1,
-  labels = NULL, plot = TRUE, main = "", ylab = "", bw = FALSE,
-  shape = 16, size = 2, color = NULL)
+sinaplot(x, groups, method = c("density", "neighbourhood"),
+  groupwiseScale = TRUE, yFraction = 0.02, neighbLimit = 1,
+  adjust = 3/4, xSpread = 0.1, labels = NULL, plot = TRUE, main = "",
+  ylab = "", bw = FALSE, shape = 16, size = 2, color = NULL)
 }
 \arguments{
 \item{x}{numeric vector of values to be plotted.}
