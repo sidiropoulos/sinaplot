@@ -78,7 +78,7 @@
 
 sinaplot <- function(x,
                      groups,
-                     method = "density",
+                     method = c("density", "neighbourhood"),
                      groupwiseScale = TRUE,
                      yFraction = 0.02,
                      neighbLimit = 1,
@@ -115,11 +115,7 @@ sinaplot <- function(x,
     if (xSpread <= 0)
         stop("xSpread must be > 0")
 
-    if (!(method %in% c("density", "neighbourhood"))){
-        warning("Input method not available. Choosing 'density' instead.")
-        message("Available methods: 'density', 'neighbourhood'")
-        method <- "density"
-    }
+    method <- match.arg(method)
     ###end
 
     yBins <- .binY(x, yFraction)
