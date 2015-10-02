@@ -1,6 +1,6 @@
 mu<-2
 si<-0.6
-bimodal<-c(rnorm(1000,-mu,si),rnorm(1000,mu,si)) 
+bimodal<-c(rnorm(1000,-mu,si),rnorm(1000,mu,si))
 uniform<-runif(2000,-4,4)
 normal<-rnorm(2000,0,3)
 
@@ -34,7 +34,7 @@ p1 <- sinaplot(df[,2], df[,1], size = 1.5) + ggtitle("Sina") + theme_bw()
 p1 <- p1 + geom_point(colour="black") + theme(axis.text.x = element_blank()) + ylab("log2 expression")
 
 p2 <- ggplot(aes(V1, V2),data = df) + geom_violin(fill = "grey80") + theme_bw()
-p2 <- p2 + theme(axis.text.x=element_blank()) + guides(fill=FALSE) 
+p2 <- p2 + theme(axis.text.x=element_blank()) + guides(fill=FALSE)
 p2 <- p2 + ylab("") + xlab("") + ggtitle("Violin")
 
 p3 <- ggplot(aes(V1, V2),data = df) + geom_boxplot(fill = "grey80") + theme_bw()
@@ -44,7 +44,7 @@ p3 <- p3 + ylab("log2 expression") + xlab("") + ggtitle("Box and Whisker")
 beeswarm2 <- beeswarm(df[,2] ~ df[,1])
 p4 <- ggplot(beeswarm2, aes(x, y)) + geom_point() + theme_bw()
 #p4 <- ggplot(beeswarm2, aes(x, y)) + geom_point(aes(colour = df$V1)) + scale_x_discrete(limits = labels)
-p4 <- p4 + theme(axis.text.x = element_blank()) + guides(colour=FALSE) 
+p4 <- p4 + theme(axis.text.x = element_blank()) + guides(colour=FALSE)
 p4 <- p4 + ylab("") + xlab("") + ggtitle("Bee Swarm") + xlim(c(0.5,5.5))
 
 p5 <- ggplot(df, aes(V1, V2)) + geom_jitter() + theme_bw()
@@ -79,7 +79,13 @@ for (i in 0:ceiling(1/yFraction)) {
     yBins <- c(yBins, ymin + i * window_size)
 }
 
-par(mfrow=c(1,3))
+par(mfrow=c(1,4))
+plot(rep(1, length(a)), a, xlim = c(0,2), ylim = c(4,10), ylab = "", xlab = "",
+     xaxt = "n", yaxt = "n", bty="n", pch = 20)
+axis(1, at = seq(0, 2, 0.5), labels = FALSE)
+axis(2, at = c(4,6,8,10), labels = FALSE)
+
+
 plot(rep(1, length(a)), a, xlim = c(0,2), ylim = c(4,10), ylab = "", xlab = "",
      xaxt = "n", yaxt = "n", bty="n", pch = 20)
 points(dens$y + 1, dens$x, type="l")
