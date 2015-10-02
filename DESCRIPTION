@@ -2,11 +2,11 @@ Package: sinaplot
 Type: Package
 Title: An Enhanced Chart for Simple and Truthful Representation of Single
     Observations over Multiple Classes
-Version: 0.1.1
+Version: 0.1.2
 Date: 2015-09-20
 Authors@R: c(person("Nikos", "Sidiropoulos", role = c("aut", "cre"),
     email = "nikos.sidiro@gmail.com"), person("Sina Hadi", "Sohi", role = "aut",
-    email = "sinasohi@gmail.com"), person("Nicolas Jean-Pierre Philipe",
+    email = "sinasohi@gmail.com"), person("Nicolas",
     "Rapin", role = "aut", email = "nicolas.rapin@bric.ku.dk"),
     person("Frederik Otzen", "Bagger", role = "aut"))
 Maintainer: Nikos Sidiropoulos <nikos.sidiro@gmail.com>
@@ -23,3 +23,4 @@ Suggests:
 Imports:
 License: GPL (>=2)
 LazyData: TRUE
+VignetteBuilder: knitr

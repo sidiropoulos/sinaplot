@@ -1,12 +1,14 @@
 ---
 title: 'sinaplot: an enhanced chart for simple and truthful representation of single
   observations over multiple classes'
-author: Nikos Sidiropoulos, Sina Hadi Sohi, Nicolas Jean-Pierre Philipe Rapin, Frederik
+author: Nikos Sidiropoulos, Sina Hadi Sohi, Nicolas Rapin, Frederik
   Otzen Bagger
 date: '`r Sys.Date()`'
-output: html_document
-vignette: |
-  %\VignetteIndexEntry{sinaplot} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{sinaplot}
+  %\VignetteEncoding{UTF-8}
+output: knitr:::html_vignette
 ---
 
 ## Introduction
