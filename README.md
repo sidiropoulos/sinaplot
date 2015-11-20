@@ -17,7 +17,7 @@ Or the development version from github:
 
 ```R
 # install.packages("devtools")
-devtools::install_github("sidiropoulos/ggplot2")
+devtools::install_github("sidiropoulos/sinaplot")
 ```
 
 ## Webserver
