@@ -118,21 +118,21 @@ sinaplot <- function(x,
     method <- match.arg(method)
     ###end
 
+    #remove redundant labels
+    groups <- factor(groups)
+
     yBins <- .binY(x, yFraction)
 
     #calculate new x coordinates
     x <- .getXcoord(x, groups, yBins, xSpread, groupwiseScale, neighbLimit,
                     adjust, method)
 
-    #number of groups
-    ngroups <- length(unique(groups))
-
-    newGroups <- rep(unique(groups), unlist(lapply(x, nrow)))
+    newGroups <- factor(rep(levels(groups), unlist(lapply(x, nrow))))
 
     if (!is.null(labels))
         labs <- labels
     else
-        labs <- unique(groups)
+        labs <- levels(groups)
 
     x <- do.call(rbind, x)
 
@@ -200,8 +200,8 @@ sinaplot <- function(x,
     for (j in 1:ngroups){
 
         #extract samples per group and store them in a data.frame
-        cur_xyArray <- as.data.frame(cbind(rep(j, sum(groups == unique(groups)[j])),
-                                           as.numeric(data[groups == unique(groups)[j]])))
+        cur_xyArray <- as.data.frame(cbind(rep(j, sum(groups == levels(groups)[j])),
+                                           as.numeric(data[groups == levels(groups)[j]])))
         colnames(cur_xyArray) <- c("x", "y")
 
         #find the densiest neighbourhood in the current group and compare it
