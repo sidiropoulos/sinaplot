@@ -19,3 +19,6 @@ Or the development version from github:
 # install.packages("devtools")
 devtools::install_github("sidiropoulos/ggplot2")
 ```
+
+## Webserver
+In order to aid users without experience in R we also provide access to a [webserver](http://servers.binf.ku.dk:8890/sinaplot/) accepting excel sheets to produce the plots. 
