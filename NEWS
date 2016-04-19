@@ -1,6 +1,6 @@
 sinaplot NEWS
 
-Changes in version 0.1.3 (2016-04-19)
+Changes in version 0.1.4 (2016-04-19)
 
 - Fixed a bug where the data were reordered after calculating the new x-axis
   coordinates. This was creating problems when a user wanted to plot the samples
