@@ -56,9 +56,8 @@ size.}
 color of each group.}
 }
 \value{
-if \code{plot = FALSE} a list is returned containing a data.frame
-with the new sample coordinates and a vector of length x that corresponds to
-each sample's group.
+if \code{plot = FALSE} a data.frame is returned containing the new
+sample coordinates and the group they are assigned to.
 }
 \description{
 The sinaplot is a data visualization chart suitable for plotting
@@ -87,6 +86,7 @@ samples to spread within:
 }
 }
 \examples{
+
 x <- c(rnorm(200, 4, 1), rnorm(200, 5, 2), rnorm(200, 6, 1.5))
 groups <- c(rep("Cond1", 200), rep("Cond2", 200), rep("Cond3", 200))
 
@@ -99,5 +99,6 @@ sinaplot(x, groups, groupwiseScale = FALSE, adjust = 3)
 data("blood", package = "sinaplot")
 sinaplot(blood$value, blood$type, method = "neighbourhood")
 sinaplot(blood$value, blood$type, method = "neighbourhood", groupwiseScale = FALSE)
+
 }
 
