@@ -126,11 +126,8 @@ sinaplot <- function(x,
     x <- .getXcoord(x, groups, yBins, xSpread, groupwiseScale, neighbLimit,
                     adjust, method)
 
-
-    if (!is.null(labels))
-        labs <- labels
-    else
-        labs <- levels(groups)
+    if (is.null(labels))
+        labels <- levels(groups)
 
     newGroups <- factor(rep(levels(groups), unlist(lapply(x, nrow))))
 
@@ -140,8 +137,8 @@ sinaplot <- function(x,
     x$groups <- newGroups
 
     #order the data frame based on the input order
-    x <- x[with(x, order(idx)), ]
-    x <- subset(x, select = - idx)
+    x <- x[order(x$idx), ]
+    x <- x[, c("x", "y", "groups")]
 
     if (plot){
 
@@ -152,7 +149,9 @@ sinaplot <- function(x,
         if (bw)
             p <- p + ggplot2::theme_bw()
 
-        p <- p + ggplot2::scale_x_discrete(limits = labs) +
+        p <- p + ggplot2::scale_x_continuous(breaks = 1:length(labels),
+                                             labels = labels,
+                                             minor_breaks = NULL) +
             ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45,
                                                                hjust = 1))
         p <- p + ggplot2::xlab("") + ggplot2::ylab(ylab) +
@@ -203,7 +202,7 @@ sinaplot <- function(x,
     }
 
     #keep an index of the original data order
-    idx = 1:length(data)
+    idx <- 1:length(data)
 
     for (j in 1:ngroups){
 
