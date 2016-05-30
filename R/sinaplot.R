@@ -17,7 +17,7 @@
 #' @param neighbLimit if the samples within the same y-axis bin are more than
 #' neighbLimit, the samples's X coordinates will be adjusted.
 #' @param adjust adjusts the bandwidth of the density kernel when
-#' \code{method = "density"} (see \code{\link[stats]{density}}).
+#' \code{method == "density"} (see \code{\link[stats]{density}}).
 #' @param xSpread tuning parameter that adjusts the spread of the samples within
 #' the same neighbourhood along the x-axis when \code{method = "neighbourhood"}.
 #' Accepts values between 0 and 1.
