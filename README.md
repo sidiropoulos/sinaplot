@@ -1,5 +1,6 @@
 # SinaPlot: an enhanced chart for simple and truthful representation of single observations over multiple classes
 
+[![Build Status](https://travis-ci.org/sidiropoulos/sinaplot.svg?branch=master)](https://travis-ci.org/sidiropoulos/sinaplot)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/sinaplot)](https://cran.r-project.org/package=sinaplot)
 [![CRAN_Downloads_Badge](http://cranlogs.r-pkg.org/badges/sinaplot)](https://cran.r-project.org/package=sinaplot)
 
