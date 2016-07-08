@@ -171,7 +171,7 @@ sinaplot <- function(x,
     ymax <- max(data)
 
     #window width
-    window_size <- (ymax - ymin) * yFraction
+    window_size <- (ymax - ymin) * (yFraction + 1e-8)
 
     yBins <- c()
     for (i in 0:ceiling(1/yFraction)) {

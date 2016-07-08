@@ -1,5 +1,10 @@
 sinaplot NEWS
 
+Changes in version 0.1.6 (2016-07-08)
+
+- Fixed a bug where having samples values overlapping the outermost y-bin
+  boundaries produced an error (thanks to John Hoch)
+
 Changes in version 0.1.5 (2016-05-14)
 
 - Fixed a bug that was plotting the first and last classes beyond the figure
