@@ -2,7 +2,7 @@ Package: sinaplot
 Type: Package
 Title: An Enhanced Chart for Simple and Truthful Representation of Single
     Observations over Multiple Classes
-Version: 0.1.6
+Version: 1.0.0
 Date: 2016-07-08
 Authors@R: c(person("Nikos", "Sidiropoulos", role = c("aut", "cre"),
     email = "nikos.sidiro@gmail.com"), person("Sina Hadi", "Sohi", role = "aut",
@@ -16,7 +16,7 @@ Description: The sinaplot is a data visualization chart suitable for plotting
     distribution of the data within each class.
 Depends:
     R(>= 3.1.0),
-    ggplot2(>= 1.0.1)
+    plyr(>= 1.8.4)
 Suggests:
     rmarkdown,
     knitr,
@@ -25,3 +25,4 @@ Imports:
 License: GPL (>=2)
 LazyData: TRUE
 VignetteBuilder: knitr
+RoxygenNote: 5.0.1

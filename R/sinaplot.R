@@ -1,40 +1,41 @@
 #' @title sinaplot
-#' @description The sinaplot is a data visualization chart suitable for plotting
+#'
+#' @description The SinaPlot is a data visualization chart suitable for plotting
 #' any single variable in a multiclass dataset. It is an enhanced jitter strip
 #' chart, where the width of the jitter is controlled by the density
 #' distribution of the data within each class.
 #'
 #' @param x numeric vector of values to be plotted.
+#'
 #' @param groups vector of \code{length(x)}.
+#'
 #' @param method choose the method to spread the samples within the same
-#' neighbourhood along the x-axis. Available methods: "density",
-#' "neighbourhood". See \code{Details}.
-#' @param groupwiseScale logical. When set to \code{TRUE} x-coordinate widths across all
+#' bin along the x-axis. Available methods: "density" and "counts".
+#' See \code{Details}.
+#'
+#' @param scale logical. When set to \code{TRUE} x-coordinate widths across all
 #' groups are scaled based on the densiest are in the plot. Default: \code{TRUE}
-#' @param yFraction binning factor. The range of the values in \code{x} are
-#' binned in windows of length \code{(max(x) - min(x)) * yFraction}. Samples
-#' within the same bin belong to the same "neighbourhood".
-#' @param neighbLimit if the samples within the same y-axis bin are more than
-#' neighbLimit, the samples's X coordinates will be adjusted.
+#'
+#' @param bins number of bins to divide the y-axis into. Default: 50.
+#'
+#' @param bin_limit If the samples within the same y-axis bin are more
+#' than \code{bin_limit}, the samples's X coordinates will be adjusted.
+#'
 #' @param adjust adjusts the bandwidth of the density kernel when
 #' \code{method == "density"} (see \code{\link[stats]{density}}).
-#' @param xSpread tuning parameter that adjusts the spread of the samples within
-#' the same neighbourhood along the x-axis when \code{method = "neighbourhood"}.
-#' Accepts values between 0 and 1.
-#' @param labels optional arguments that controls the labels along the x-axis.
-#' Must be of length \code{unique(groups)}.
+#'
+#' @param maxwidth Control the maximum width the points can spread into. Values
+#' between 0 and 1.
+#'
 #' @param plot logical. When \code{TRUE} the sinaplot is produced, otherwise the
 #' function returns the new sample coordinates. Default: \code{TRUE}
-#' @param main plot title
-#' @param ylab Y axis title
-#' @param bw logical. If \code{TRUE} a theme with white background and black
-#' gridlines is used. Default: FALSE
-#' @param shape single value or vector of \code{length(x)}. Controls the sample
-#' shape.
-#' @param size single value of vector of \code{length(x)}. Controls the sample
-#' size.
+#'
+#' @param ylab Y axis label
+#'
 #' @param color vector of \code{length(unique(groups))}. Controls the sample
 #' color of each group.
+#'
+#' @param ... arguments to be passed to \code{\link[graphics]{plot}}.
 #'
 #' @details There are two available ways to define the x-axis borders for the
 #' samples to spread within:
@@ -45,54 +46,68 @@
 #'   borders are then defined by the density curve. Tuning parameter
 #'   \code{adjust} can be used to control the density bandwidth in the same way
 #'   it is used in \code{\link[stats]{density}}. }
-#'  \item{\code{method = "neighbourhood"}:
+#'
+#'  \item{\code{method = "counts"}:
 #'
 #'  The borders are defined by the number of samples that 'live' in the same
-#'  neighbourhood and the parameter \code{xSpread} in the following fashion:
+#'  bin and the parameter \code{maxwidth} in the following fashion:
 #'
-#'  \code{xBorder = nsamples * xSpread}
+#'  \code{xBorder = nsamples * maxwidth}
 #'
 #'   }
 #' }
-#' @return if \code{plot = FALSE} a data.frame is returned containing the new
-#' sample coordinates and the group they are assigned to.
+#'
+#' @return
+#'
+#' If \code{plot == FALSE} the function returns a data.frame with the
+#' following columns:
+#'
+#' \item{x}{discrete x-coordinates, split by group}
+#' \item{y}{input values}
+#' \item{group}{input groups}
+#' \item{bin_counts}{number of samples per bin per group}
+#' \item{scaled}{final x-coordinates, adjusted by sinaplot}
 #'
 #' @examples
 #'
-#' x <- c(rnorm(200, 4, 1), rnorm(200, 5, 2), rnorm(200, 6, 1.5))
-#' groups <- c(rep("Cond1", 200), rep("Cond2", 200), rep("Cond3", 200))
+#' x <- c(rnorm(200, 4, 1), rnorm(200, 5, 2), rnorm(400, 6, 1.5))
+#' groups <- c(rep("Cond1", 200), rep("Cond2", 200), rep("Cond3", 400))
 #'
 #' sinaplot(x, groups)
-#' sinaplot(x, groups, groupwiseScale = FALSE)
-#' sinaplot(x, groups, groupwiseScale = FALSE, adjust = 1/6)
-#' sinaplot(x, groups, groupwiseScale = FALSE, adjust = 3)
+#' sinaplot(x, groups, scale = FALSE)
+#' sinaplot(x, groups, scale = FALSE, adjust = 1/6)
+#' sinaplot(x, groups, scale = FALSE, adjust = 3)
 #'
 #' #blood
 #' data("blood", package = "sinaplot")
-#' sinaplot(blood$value, blood$type, method = "neighbourhood")
-#' sinaplot(blood$value, blood$type, method = "neighbourhood", groupwiseScale = FALSE)
 #'
-#' @import ggplot2
+#' old.mar <- par()$mar
+#' par(mar = c(9,4,4,2) + 0.1)
+#'
+#' sinaplot(blood$value, blood$type)
+#' sinaplot(blood$value, blood$type, method = "counts")
+#' sinaplot(blood$value, blood$type, method = "counts", scale = FALSE)
+#'
+#' par(mar = old.mar)
+#'
+#' @importFrom plyr ddply mutate
+#' @importFrom graphics axis par text
 #' @export
 
 sinaplot <- function(x,
                      groups,
-                     method = c("density", "neighbourhood"),
-                     groupwiseScale = TRUE,
-                     yFraction = 0.02,
-                     neighbLimit = 1,
+                     method = c("density", "counts"),
+                     scale = TRUE,
+                     bins = 50,
+                     bin_limit = 1,
                      adjust = 3/4,
-                     xSpread = 0.1,
-                     labels = NULL,
+                     maxwidth = 1,
                      plot = TRUE,
 
                      #Plot parameters
-                     main = "",
                      ylab = "",
-                     bw = FALSE,
-                     shape = 16,
-                     size = 2,
-                     color = NULL
+                     color = NULL,
+                     ...
                      )
 {
 
@@ -100,19 +115,29 @@ sinaplot <- function(x,
     if (length(x) != length(groups))
         stop("x and groups must be of the same length.")
 
-    if (neighbLimit < 1 | !is.numeric(neighbLimit)){
-        warning("Invalid neighbLimit value. Neighblimit was set to 1.")
-        neighbLimit = 1
+    if (!is.null(color)){
+        if (length(color) != length(unique(groups))){
+            warning("color and unique 'groups' values must be of the same length.")
+            color = NULL
+        }
     }
 
-    if (!is.null(labels) & length(labels) != length(unique(groups)))
-        stop("labels and unique 'groups' values must be of the same length.")
+    if (bin_limit < 1 | !is.numeric(bin_limit)){
+        warning("Invalid bin_limit value. bin_limit was set to 1.")
+        bin_limit = 1
+    }
 
-    if (yFraction <= 0)
-        stop("yFraction must be > 0")
+    if (bins <= 0) {
+        warning("bins must be > 0. Set to 50.")
+        bins <- 50
+    }
 
-    if (xSpread <= 0)
-        stop("xSpread must be > 0")
+    if (maxwidth < 0 | maxwidth > 1){
+        warning("maxwidth must be between 0 and 1. maxwidth set to 1.")
+        maxwidth <- 1
+    }
+
+    bin_counts <- NULL
 
     method <- match.arg(method)
     ###end
@@ -120,171 +145,115 @@ sinaplot <- function(x,
     #remove redundant labels
     groups <- factor(groups)
 
-    yBins <- .binY(x, yFraction)
+    yBins <- .binY(range(x), bins)
+    data <- data.frame(x = as.numeric(groups), y = x, group = groups,
+                       bin_counts = 0, x_translation = 0)
 
-    #calculate new x coordinates
-    x <- .getXcoord(x, groups, yBins, xSpread, groupwiseScale, neighbLimit,
-                    adjust, method)
+    data <- ddply(data, "group", .compute, method, maxwidth, adjust, bin_limit,
+                  yBins)
 
-    if (is.null(labels))
-        labels <- levels(groups)
+    if (scale) {
+        group_scaling_factor <-
+            ddply(data, "group", mutate,
+                  group_max = max(bin_counts))$group_max / max(data$bin_counts)
+    } else {
+        group_scaling_factor <- 1
+    }
 
-    newGroups <- factor(rep(levels(groups), unlist(lapply(x, nrow))))
+    data$scaled <- data$x + data$x_translation * group_scaling_factor
 
-    #unlist
-    x <- do.call(rbind, x)
-
-    x$groups <- newGroups
-
-    #order the data frame based on the input order
-    x <- x[order(x$idx), ]
-    x <- x[, c("x", "y", "groups")]
+    #drop translation column
+    data$x_translation <- NULL
 
     if (plot){
 
-        p <- ggplot2::ggplot(ggplot2::aes_string(x = 'x', y = 'y',
-                                                 color = 'groups'), data = x) +
-            ggplot2::geom_point(size = size, shape = shape)
+        if (is.null(color))
+            color = "#000000"
+        else
+            color <- color[as.numeric(data$group)]
 
-        if (bw)
-            p <- p + ggplot2::theme_bw()
+        plot(data$scaled, data$y, xlab = "", ylab = ylab, xaxt = "n",
+             col = color, xlim = c(0.5, length(levels(data$group)) + 0.5), ...)
+        axis(1, at = 1:length(levels(data$group)), labels = FALSE)
 
-        p <- p + ggplot2::scale_x_continuous(breaks = 1:length(labels),
-                                             labels = labels,
-                                             minor_breaks = NULL) +
-            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45,
-                                                               hjust = 1))
-        p <- p + ggplot2::xlab("") + ggplot2::ylab(ylab) +
-            ggplot2::guides(color=FALSE) + ggplot2::ggtitle(main)
-
-        if (!is.null(color))
-            p <- p + ggplot2::scale_color_manual(values = color)
-        p
+        text(x = 1:length(levels(data$group)),
+             y = par()$usr[3]-0.1*(par()$usr[4]-par()$usr[3]),
+             labels = levels(data$group), srt=45, xpd=TRUE, adj = 1, cex = .8)
 
     } else
-        x
+        data
 }
 
-.binY <- function(data, yFraction) {
+.compute <- function(data, method, maxwidth, adjust, bin_limit, bins) {
+    #initialize x_translation and bin_counts to 0
+
+    #if group has less than 2 points return as is
+    if (nrow(data) < 2) {
+        data$max_bin_counts <- 1
+        return(data)
+    }
+
+    #per bin sample count
+    bin_counts <- table(findInterval(data$y, bins))
+
+    #per bin sample density
+    if (method == "density") {
+        densities <- stats::density(data$y, adjust = adjust)
+
+        #confine the samples in a (-maxwidth/2, -maxwidth/2) area around the
+        #group's center
+        if (max(densities$y) > 0.5 * maxwidth)
+            intra_scaling_factor <- 0.5 * maxwidth / max(densities$y)
+        else
+            intra_scaling_factor <- 1
+
+    } else {
+        #allow up to 50 samples in a bin without scaling
+        if (max(bin_counts) > 50 * maxwidth) {
+            intra_scaling_factor <- 50 * maxwidth / max(bin_counts)
+        } else
+            intra_scaling_factor <- 1
+    }
+
+    for (i in names(bin_counts)) {
+        #examine bins with more than 'bin_limit' samples
+        if (bin_counts[i] > bin_limit){
+            cur_bin <- bins[ as.integer(i) : (as.integer(i) + 1)]
+
+            #find samples in the current bin and translate their X coord.
+            points <- findInterval(data$y, cur_bin) == 1
+
+            #compute the border margin for the current bin.
+            if (method == "density")
+                xmax <- mean(densities$y[findInterval(densities$x, cur_bin) == 1])
+            else
+                xmax <- bin_counts[i] / 100
+
+            #assign the samples uniformely within the specified range
+            x_translation <- stats::runif(bin_counts[i], - xmax, xmax)
+
+            #scale and store new x coordinates
+            data$x_translation[points] <- x_translation * intra_scaling_factor
+            #store bin counts. Used for group-wise scaling.
+            data$bin_counts[points] <- bin_counts[i]
+        }
+    }
+
+    data
+}
+
+.binY <- function(data, bins) {
     #get y value range
     ymin <- min(data)
     ymax <- max(data)
 
     #window width
-    window_size <- (ymax - ymin) * (yFraction + 1e-8)
+    window_size <- (ymax - ymin) / (bins + 1e-8)
 
     yBins <- c()
-    for (i in 0:ceiling(1/yFraction)) {
+    for (i in 0:ceiling(bins)) {
         yBins <- c(yBins, ymin + i * window_size)
     }
 
     yBins
 }
-
-.getXcoord <- function(data, groups, yBins, xSpread, groupwiseScale,
-                       neighbLimit, adjust, method){
-
-    #number of groups
-    ngroups <- length(unique(groups))
-
-    xyArray <- c()
-
-    ###find the densiest area in the plot
-    neighbours <- list()
-
-    #set maxNeighbours
-    maxNeighbours <- 0
-
-    #method == "density"
-    if (method == "density"){
-        maxDensity <- 0
-        densities <- c()
-    }
-
-    #keep an index of the original data order
-    idx <- 1:length(data)
-
-    for (j in 1:ngroups){
-
-        #extract samples per group and store them in a data.frame
-        keep <- groups == levels(groups)[j]
-        cur_xyArray <- as.data.frame(cbind(rep(j, sum(keep)),
-                                           as.numeric(data[keep]), idx[keep]))
-        colnames(cur_xyArray) <- c("x", "y", "idx")
-
-        #find the densiest neighbourhood in the current group and compare it
-        #with the global max
-        cur_neighbours <- table(findInterval(cur_xyArray$y, yBins))
-        cur_maxNeighbours <- max(cur_neighbours)
-
-        if (cur_maxNeighbours > maxNeighbours)
-            maxNeighbours <- cur_maxNeighbours
-
-        if (method == "density"){
-            #find the highest density value
-            cur_density <- density(cur_xyArray$y, adjust = adjust)
-            cur_maxDensity <- max(cur_density$y)
-
-            if (cur_maxDensity > maxDensity)
-                maxDensity <- cur_maxDensity
-
-            densities <- c(densities, list(cur_density))
-        }
-
-        #store neighbour and sample per group data frames in lists
-        neighbours <- c(neighbours, list(cur_neighbours))
-        xyArray <- c(xyArray, list(cur_xyArray))
-    }
-
-    relScalingFactor <- 1
-
-    for (j in 1:ngroups){
-
-        #confine the sample
-        if (method == "density"){
-            if (max(densities[[j]]$y) > 0.48)
-                scalingFactor <- 0.48 / max(densities[[j]]$y)
-            else
-                scalingFactor <- 1
-        }else {
-            #if the space required to spread the samples in a neighbourhood exceeds
-            #1, create a scaling factor to compress the points
-            if (max(neighbours[[j]]) > 1/xSpread){
-                scalingFactor <- (1/xSpread) / max(neighbours[[j]])
-            }else
-                scalingFactor <- 1
-        }
-
-        #scale all neighbourhoods based on their density relative to the
-        #densiest neighbourhood
-        if (groupwiseScale == TRUE)
-            relScalingFactor <- max(neighbours[[j]]) / maxNeighbours
-
-        for (i in names(neighbours[[j]])){
-
-            #examine neighbourhoods with more than 'neighbLimit' samples
-            if (neighbours[[j]][i] > neighbLimit){
-                cur_bin <- yBins[ as.integer(i) : (as.integer(i) + 1)]
-
-                #find samples in the current bin and translate their X coord.
-                points <- findInterval(xyArray[[j]]$y, cur_bin) == 1
-
-                #compute the border margin for the current bin
-                if (method == "density")
-                    xMax <- mean(densities[[j]]$y[findInterval(densities[[j]]$x,
-                                                               cur_bin) == 1])
-                else
-                    xMax <- xSpread*neighbours[[j]][i] / 2
-
-                #assign the samples uniformely within the specified range
-                xTranslate <- runif(neighbours[[j]][i], -xMax, xMax )
-
-                #store new x coordinates
-                xyArray[[j]]$x[points] <- xyArray[[j]]$x[points] +
-                    (xTranslate * scalingFactor * relScalingFactor)
-            }
-        }
-    }
-    xyArray
-}
-

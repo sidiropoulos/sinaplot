@@ -1,32 +1,71 @@
 sinaplot NEWS
 
+Changes in version 1.0.0 (2016-10-11)
+
+- Major graphic update. SinaPlot now uses "base" graphics instead of ggplot2.
+  geom_sina() is now part of ggforce (https://github.com/thomasp85/ggforce),
+  an extention of ggplot2, and can be used to produce sinaplots with ggplot2.
+
+- Major functional update. Several parameters have been added, renamed, replaced
+  or removed.
+  Read below for details.
+
+  Added:
+  - "maxwidth" confines the spread of the samples along the x-axis. 0 is
+  equivalent to no spread, 1 allows for maximum spread.
+  - Any argument can be passed to plot(), e.g. "cex" = 0.8, "pch" = 20, etc.
+
+  Renamed:
+  - Method "neighbourhood" is renamed to "counts".
+  - "neighbLimit" is renamed to "bin_limit".
+  - "groupwiseScale" is renamed to "scale".
+
+  Replaced:
+  - "yFraction" is replaced with "bins". Instead of specifying the fraction of
+  the data range for each bin, now you provide the number of bins.
+
+  Removed:
+  - "xSpread".
+  - "labels" .
+  - "main", "bw", "shape" and "size".
+
+- If "plot == FALSE" the function returns a data frame with columns:
+
+  x: discrete x-coordinates, split by group
+  y: input values
+  group: input groups
+  bin_count: number of samples per bin per group
+  scaled: final x-coordinates, adjusted by the sinaplot method
+
+================================================================================
+
 Changes in version 0.1.6 (2016-07-08)
 
 - Fixed a bug where having samples values overlapping the outermost y-bin
-  boundaries produced an error (thanks to John Hoch)
+  boundaries produced an error (thanks to John Hoch).
 
 Changes in version 0.1.5 (2016-05-14)
 
 - Fixed a bug that was plotting the first and last classes beyond the figure
-  margins
+  margins.
 
 Changes in version 0.1.4 (2016-04-19)
 
 - Fixed a bug where the data were reordered after calculating the new x-axis
   coordinates. This was creating problems when a user wanted to plot the samples
-  with custom colors using sinaplot() + geom_point(col = mycol)
+  with custom colors using sinaplot() + geom_point(col = mycol).
 
 
 Changes in version 0.1.3 (2015-11-20)
 
 - "groups" are treated as factors and they are plotted in the order that their
   levels appear (alphabetically by default) providing a similar output format with
-  default ggplot2 plots
+  default ggplot2 plots.
 
 Changes in version 0.1.2 (2015-10-02)
 
-- NEWS file added
+- NEWS file added.
 - Changes in vignette compiling. knitr is added as the vignette builder in the
-  DESCRIPTION FILE
-- Author details edited
-- Removed redundant "inst/temp.R" file
+  DESCRIPTION FILE.
+- Author details edited.
+- Removed redundant "inst/temp.R" file.
