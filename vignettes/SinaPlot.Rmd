@@ -35,11 +35,13 @@ in a very simple, comprehensible and condensed format.
 ## Examples
 
 ```{r example, fig.align='center', fig.width=5, fig.height=4}
-x <- c(rnorm(200, 4, 1), rnorm(200, 5, 2), rnorm(200, 6, 1.5))
-groups <- c(rep("Cond1", 200), rep("Cond2", 200), rep("Cond3", 200))
+x <- c(rnorm(200, 4, 1), rnorm(200, 5, 2), rnorm(400, 6, 1.5))
+groups <- c(rep("Cond1", 200), rep("Cond2", 200), rep("Cond3", 400))
 
 library(sinaplot)
 sinaplot(x, groups)
+#Use any "plot" argument
+sinaplot(x, groups, col = c(2,3,4), pch = 20, bty = "n")
 ```
 
 ### Blood 
@@ -53,26 +55,29 @@ knitr::kable(head(blood, 10))
 
 ---
 ```{r bloodDensity, fig.align='center', fig.height=6, fig.width=7}
-sinaplot(blood$value, blood$type)
+par(mar = c(9,4,4,2) + 0.1)
+sinaplot(blood$value, blood$type, pch = 20)
 ```
 
 ---
 
-Using the `method = "neighbourhood"` to compute the borders we get a less smooth 
+Using the `method = "counts"` to compute the borders we get a less smooth 
 spread of the samples due to the absence of the kernel density estimate.
 
-```{r bloodNeighb, fig.align='center', fig.height=6, fig.width=7}
-sinaplot(blood$value, blood$type, method = "neighbourhood")
+```{r bloodCounts, fig.align='center', fig.height=6, fig.width=7}
+par(mar = c(9,4,4,2) + 0.1)
+sinaplot(blood$value, blood$type, method = "counts", pch = 20)
 ```
 
 ---
 
-Setting the argument `groupwiseScale = FALSE we` turn off the relative scaling of all the 
-sample types based on the one with the highest density.
+By setting the argument `scale = FALSE we` turn off the relative scaling of all 
+the sample types based on the one with the highest density.
 
 ```{r bloodScaleOff, fig.align='center', fig.height=6, fig.width=7}
-sinaplot(blood$value, blood$type, method = "neighbourhood", 
-         groupwiseScale = FALSE)
+par(mar = c(9,4,4,2) + 0.1)
+sinaplot(blood$value, blood$type, method = "counts", scale = FALSE,
+         pch = 20)
 ```
 
 ## Comparison
