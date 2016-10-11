@@ -3,7 +3,7 @@ Type: Package
 Title: An Enhanced Chart for Simple and Truthful Representation of Single
     Observations over Multiple Classes
 Version: 1.0.0
-Date: 2016-07-08
+Date: 2016-10-11
 Authors@R: c(person("Nikos", "Sidiropoulos", role = c("aut", "cre"),
     email = "nikos.sidiro@gmail.com"), person("Sina Hadi", "Sohi", role = "aut",
     email = "sinasohi@gmail.com"), person("Nicolas", "Rapin", role = "aut",
@@ -11,7 +11,7 @@ Authors@R: c(person("Nikos", "Sidiropoulos", role = c("aut", "cre"),
     role = "aut", email = "frederik@binf.ku.dk"))
 Maintainer: Nikos Sidiropoulos <nikos.sidiro@gmail.com>
 Description: The sinaplot is a data visualization chart suitable for plotting
-    any single variable in a multiclass dataset. It is an enhanced jitter strip
+    any single variable in a multiclass data set. It is an enhanced jitter strip
     chart, where the width of the jitter is controlled by the density
     distribution of the data within each class.
 Depends:
