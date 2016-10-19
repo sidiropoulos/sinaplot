@@ -100,7 +100,7 @@ sinaplot <- function(x,
                      scale = TRUE,
                      bins = 50,
                      bin_limit = 1,
-                     adjust = 3/4,
+                     adjust = 0.75,
                      maxwidth = 1,
                      plot = TRUE,
 
@@ -108,8 +108,7 @@ sinaplot <- function(x,
                      ylab = "",
                      color = NULL,
                      ...
-                     )
-{
+                     ) {
 
     ###Check input arguments
     if (length(x) != length(groups))
@@ -117,14 +116,15 @@ sinaplot <- function(x,
 
     if (!is.null(color)){
         if (length(color) != length(unique(groups))){
-            warning("color and unique 'groups' values must be of the same length.")
-            color = NULL
+           warning(strwrap("color and unique 'groups' values must be
+                           of the same length."))
+           color <- NULL
         }
     }
 
     if (bin_limit < 1 | !is.numeric(bin_limit)){
         warning("Invalid bin_limit value. bin_limit was set to 1.")
-        bin_limit = 1
+        bin_limit <- 1
     }
 
     if (bins <= 0) {
@@ -145,12 +145,12 @@ sinaplot <- function(x,
     #remove redundant labels
     groups <- factor(groups)
 
-    yBins <- .binY(range(x), bins)
+    ybins <- .bin_y(range(x), bins)
     data <- data.frame(x = as.numeric(groups), y = x, group = groups,
                        bin_counts = 0, x_translation = 0)
 
     data <- ddply(data, "group", .compute, method, maxwidth, adjust, bin_limit,
-                  yBins)
+                  ybins)
 
     if (scale) {
         group_scaling_factor <-
@@ -168,7 +168,7 @@ sinaplot <- function(x,
     if (plot){
 
         if (is.null(color))
-            color = "#000000"
+            color <- "#000000"
         else
             color <- color[as.numeric(data$group)]
 
@@ -177,8 +177,9 @@ sinaplot <- function(x,
         axis(1, at = 1:length(levels(data$group)), labels = FALSE)
 
         text(x = 1:length(levels(data$group)),
-             y = par()$usr[3]-0.1*(par()$usr[4]-par()$usr[3]),
-             labels = levels(data$group), srt=45, xpd=TRUE, adj = 1, cex = .8)
+             y = par()$usr[3] - 0.1 * (par()$usr[4] - par()$usr[3]),
+             labels = levels(data$group), srt = 45, xpd = TRUE, adj = 1,
+             cex = .8)
 
     } else
         data
@@ -225,7 +226,8 @@ sinaplot <- function(x,
 
             #compute the border margin for the current bin.
             if (method == "density")
-                xmax <- mean(densities$y[findInterval(densities$x, cur_bin) == 1])
+                xmax <- mean(densities$y[findInterval(densities$x,
+                  cur_bin) == 1])
             else
                 xmax <- bin_counts[i] / 100
 
@@ -242,7 +244,7 @@ sinaplot <- function(x,
     data
 }
 
-.binY <- function(data, bins) {
+.bin_y <- function(data, bins) {
     #get y value range
     ymin <- min(data)
     ymax <- max(data)
@@ -250,10 +252,10 @@ sinaplot <- function(x,
     #window width
     window_size <- (ymax - ymin) / (bins + 1e-8)
 
-    yBins <- c()
+    ybins <- c()
     for (i in 0:ceiling(bins)) {
-        yBins <- c(yBins, ymin + i * window_size)
+        ybins <- c(ybins, ymin + i * window_size)
     }
 
-    yBins
+    ybins
 }
