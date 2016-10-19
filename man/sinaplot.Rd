@@ -5,7 +5,7 @@
 \title{sinaplot}
 \usage{
 sinaplot(x, groups, method = c("density", "counts"), scale = TRUE,
-  bins = 50, bin_limit = 1, adjust = 3/4, maxwidth = 1, plot = TRUE,
+  bins = 50, bin_limit = 1, adjust = 0.75, maxwidth = 1, plot = TRUE,
   ylab = "", color = NULL, ...)
 }
 \arguments{
