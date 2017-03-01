@@ -137,7 +137,7 @@ sinaplot <- function(x,
         maxwidth <- 1
     }
 
-    bin_counts <- NULL
+    bin <- NULL
 
     method <- match.arg(method)
     ###end
@@ -145,17 +145,16 @@ sinaplot <- function(x,
     #remove redundant labels
     groups <- factor(groups)
 
-    ybins <- .bin_y(range(x), bins)
     data <- data.frame(x = as.numeric(groups), y = x, group = groups,
-                       bin_counts = 0, x_translation = 0)
+                       x_translation = 0)
 
     data <- ddply(data, "group", .compute, method, maxwidth, adjust, bin_limit,
-                  ybins)
+                  bins)
 
     if (scale) {
-        group_scaling_factor <-
-            ddply(data, "group", mutate,
-                  group_max = max(bin_counts))$group_max / max(data$bin_counts)
+        group_max  <- ddply(data, "group", mutate,
+                            group_max = max(table(bin)))$group_max
+        group_scaling_factor <- group_max / max(group_max)
     } else {
         group_scaling_factor <- 1
     }
@@ -163,7 +162,7 @@ sinaplot <- function(x,
     data$scaled <- data$x + data$x_translation * group_scaling_factor
 
     #drop translation column
-    data$x_translation <- NULL
+    #data$x_translation <- NULL
 
     if (plot){
 
@@ -185,64 +184,74 @@ sinaplot <- function(x,
         data
 }
 
-.compute <- function(data, method, maxwidth, adjust, bin_limit, bins) {
+.compute <- function(data, method, maxwidth, adjust, bin_limit, n_bins) {
     #initialize x_translation and bin_counts to 0
 
     #if group has less than 2 points return as is
     if (nrow(data) < 2) {
-        data$max_bin_counts <- 1
-        return(data)
+        data$bin <- 1
+        data
     }
-
-    #per bin sample count
-    bin_counts <- table(findInterval(data$y, bins))
 
     #per bin sample density
     if (method == "density") {
-        densities <- stats::density(data$y, adjust = adjust)
+        density <- stats::density(data$y, adjust = adjust)
 
         #confine the samples in a (-maxwidth/2, -maxwidth/2) area around the
         #group's center
-        if (max(densities$y) > 0.5 * maxwidth)
-            intra_scaling_factor <- 0.5 * maxwidth / max(densities$y)
+        if (max(density$y) > 0.5 * maxwidth)
+            intra_scaling_factor <- 0.5 * maxwidth / max(density$y)
         else
             intra_scaling_factor <- 1
 
+        # assign data points to density bins
+        data$bin <- findInterval(data$y, density$x)
+
+        # jitter points based on the density
+        x_translation <- sapply(density$y[data$bin], .jitter)
+
+        #scale and store new x coordinates
+        data$x_translation <- x_translation * intra_scaling_factor
+
     } else {
+
+        bins <- .bin_y(range(data$y), n_bins)
+        #per bin sample count
+        data$bin <- findInterval(data$y, bins)
+
+        bin_counts <- table(data$bin)
+
         #allow up to 50 samples in a bin without scaling
         if (max(bin_counts) > 50 * maxwidth) {
             intra_scaling_factor <- 50 * maxwidth / max(bin_counts)
-        } else
+        } else {
             intra_scaling_factor <- 1
-    }
+        }
 
-    for (i in names(bin_counts)) {
-        #examine bins with more than 'bin_limit' samples
-        if (bin_counts[i] > bin_limit){
-            cur_bin <- bins[ as.integer(i) : (as.integer(i) + 1)]
+        for (i in names(bin_counts)) {
+            #examine bins with more than 'bin_limit' samples
+            if (bin_counts[i] > bin_limit){
+                cur_bin <- bins[ as.integer(i) : (as.integer(i) + 1)]
 
-            #find samples in the current bin and translate their X coord.
-            points <- findInterval(data$y, cur_bin) == 1
+                #find samples in the current bin and translate their X coord.
+                points <- findInterval(data$y, cur_bin) == 1
 
-            #compute the border margin for the current bin.
-            if (method == "density")
-                xmax <- mean(densities$y[findInterval(densities$x,
-                  cur_bin) == 1])
-            else
+                #compute the border margin for the current bin.
                 xmax <- bin_counts[i] / 100
 
-            #assign the samples uniformely within the specified range
-            x_translation <- stats::runif(bin_counts[i], - xmax, xmax)
+                #assign the samples uniformely within the specified range
+                x_translation <- stats::runif(bin_counts[i], - xmax, xmax)
 
-            #scale and store new x coordinates
-            data$x_translation[points] <- x_translation * intra_scaling_factor
-            #store bin counts. Used for group-wise scaling.
-            data$bin_counts[points] <- bin_counts[i]
+                #scale and store new x coordinates
+                data$x_translation[points] <- x_translation * intra_scaling_factor
+            }
         }
     }
 
     data
 }
+
+.jitter <- function(x) { stats::runif(1, - x, x) }
 
 .bin_y <- function(data, bins) {
     #get y value range
