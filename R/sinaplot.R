@@ -208,6 +208,7 @@ sinaplot <- function(x,
         data$bin <- findInterval(data$y, density$x)
 
         # jitter points based on the density
+        set.seed(75)
         x_translation <- sapply(density$y[data$bin], .jitter)
 
         #scale and store new x coordinates
@@ -240,6 +241,7 @@ sinaplot <- function(x,
                 xmax <- bin_counts[i] / 100
 
                 #assign the samples uniformely within the specified range
+                set.seed(75)
                 x_translation <- stats::runif(bin_counts[i], - xmax, xmax)
 
                 #scale and store new x coordinates
