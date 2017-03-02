@@ -5,35 +5,8 @@
 #' chart, where the width of the jitter is controlled by the density
 #' distribution of the data within each class.
 #'
-#' @param x numeric vector of values to be plotted.
-#'
-#' @param groups vector of \code{length(x)}.
-#'
-#' @param method choose the method to spread the samples within the same
-#' bin along the x-axis. Available methods: "density" and "counts".
-#' See \code{Details}.
-#'
-#' @param scale logical. When set to \code{TRUE} x-coordinate widths across all
-#' groups are scaled based on the densiest are in the plot. Default: \code{TRUE}
-#'
-#' @param bins number of bins to divide the y-axis into. Default: 50.
-#'
-#' @param bin_limit If the samples within the same y-axis bin are more
-#' than \code{bin_limit}, the samples's X coordinates will be adjusted.
-#'
-#' @param adjust adjusts the bandwidth of the density kernel when
-#' \code{method == "density"} (see \code{\link[stats]{density}}).
-#'
-#' @param maxwidth Control the maximum width the points can spread into. Values
-#' between 0 and 1.
-#'
-#' @param plot logical. When \code{TRUE} the sinaplot is produced, otherwise the
-#' function returns the new sample coordinates. Default: \code{TRUE}
-#'
-#' @param ylab Y axis label
-#'
-#' @param color vector of \code{length(unique(groups))}. Controls the sample
-#' color of each group.
+#' @param x numeric vector or a data frame or a list of numeric vectors to be
+#' plotted.
 #'
 #' @param ... arguments to be passed to \code{\link[graphics]{plot}}.
 #'
@@ -49,7 +22,7 @@
 #'
 #'  \item{\code{method = "counts"}:
 #'
-#'  The borders are defined by the number of samples that 'live' in the same
+#'  The borders are defined by the number of samples that occupy the same
 #'  bin and the parameter \code{maxwidth} in the following fashion:
 #'
 #'  \code{xBorder = nsamples * maxwidth}
@@ -59,13 +32,9 @@
 #'
 #' @return
 #'
-#' If \code{plot == FALSE} the function returns a data.frame with the
-#' following columns:
-#'
 #' \item{x}{discrete x-coordinates, split by group}
 #' \item{y}{input values}
 #' \item{group}{input groups}
-#' \item{bin_counts}{number of samples per bin per group}
 #' \item{scaled}{final x-coordinates, adjusted by sinaplot}
 #'
 #' @examples
@@ -90,29 +59,78 @@
 #'
 #' par(mar = old.mar)
 #'
+#' @rdname sinaplot
 #' @importFrom plyr ddply mutate
 #' @importFrom graphics axis par text
 #' @export
 
-sinaplot <- function(x,
-                     groups,
+sinaplot <- function (x, ...)
+    UseMethod("sinaplot")
+
+#' @return \code{NULL}
+#'
+#' @param groups optional vector of \code{length(x)}.
+#'
+#' @param method choose the method to spread the samples within the same
+#' bin along the x-axis. Available methods: "density" and "counts".
+#' See \code{Details}.
+#'
+#' @param scale a logical that indicates whether the width of each group should
+#' be scaled relative to the group with the highest density.
+#' Default: \code{TRUE}.
+#'
+#' @param adjust adjusts the bandwidth of the density kernel when
+#' \code{method == "density"} (see \code{\link[stats]{density}}).
+#'
+#' @param bins number of bins to divide the y-axis into when
+#' \code{method == "counts"}. Default: 50.
+#'
+#' @param bin_limit if the samples within the same y-axis bin are more
+#' than \code{bin_limit}, the samples's X coordinates will be adjusted.
+#'
+#' @param maxwidth control the maximum width the points can spread into. Values
+#' between 0 and 1.
+#'
+#' @param plot logical. When \code{TRUE} the sinaplot is produced, otherwise the
+#' function returns the new sample coordinates. Default: \code{TRUE}.
+#'
+#' @param labels labels for each group. Recycled if necessary. By default,
+#' these are inferred from the data.
+#'
+#' @param xlab,ylab axis labels.
+#'
+#' @param color vector of \code{length(unique(groups))}. Controls the sample
+#' color of each group.
+#'
+#' @rdname sinaplot
+#' @method sinaplot default
+#' @export
+sinaplot.default <- function(x,
+                     groups = NULL,
                      method = c("density", "counts"),
                      scale = TRUE,
+                     adjust = 0.75,
                      bins = 50,
                      bin_limit = 1,
-                     adjust = 0.75,
                      maxwidth = 1,
                      plot = TRUE,
 
                      #Plot parameters
-                     ylab = "",
+                     labels = NULL,
+                     xlab = NULL,
+                     ylab = NULL,
                      color = NULL,
                      ...
                      ) {
 
     ###Check input arguments
-    if (length(x) != length(groups))
-        stop("x and groups must be of the same length.")
+    if (!is.null(groups)) {
+        if (!is.numeric(x))
+            stop("x must be a numeric vector if 'groups' are provided")
+
+        if (length(x) != length(groups))
+            stop("x and groups must be of the same length.")
+    }
 
     if (!is.null(color)){
         if (length(color) != length(unique(groups))){
@@ -135,6 +153,24 @@ sinaplot <- function(x,
     if (maxwidth < 0 | maxwidth > 1){
         warning("maxwidth must be between 0 and 1. maxwidth set to 1.")
         maxwidth <- 1
+    }
+
+    if (is.null(names(x))) {
+        x.names <- FALSE
+    } else {
+        x.names <- TRUE
+    }
+
+    if (is.null(groups)) {
+        if (is.numeric(x)) {
+
+            groups <- 1
+
+        } else {
+
+            groups <- rep(names(x), sapply(x, length))
+            x <- unlist(x, use.names = FALSE)
+        }
     }
 
     bin <- NULL
@@ -161,8 +197,23 @@ sinaplot <- function(x,
 
     data$scaled <- data$x + data$x_translation * group_scaling_factor
 
-    #drop translation column
-    #data$x_translation <- NULL
+    #drop columns
+    data$x_translation <- NULL
+    data$bin <- NULL
+
+    if(missing(labels) || is.null(labels)) {
+        if(!x.names) {
+            if(length(levels(groups)) == 1) {
+                labels <- NA
+            } else {
+                labels <- 1:length(levels(groups))
+            }
+        } else {
+            labels <- levels(groups)
+        }
+    } else {
+        labels <- rep(labels, length.out = length(levels(groups)))
+    }
 
     if (plot){
 
@@ -171,17 +222,54 @@ sinaplot <- function(x,
         else
             color <- color[as.numeric(data$group)]
 
-        plot(data$scaled, data$y, xlab = "", ylab = ylab, xaxt = "n",
+        plot(data$scaled, data$y, xlab = xlab, ylab = ylab, xaxt = "n",
              col = color, xlim = c(0.5, length(levels(data$group)) + 0.5), ...)
-        axis(1, at = 1:length(levels(data$group)), labels = FALSE)
+        axis(1, at = 1:length(levels(data$group)), labels = labels)
 
-        text(x = 1:length(levels(data$group)),
-             y = par()$usr[3] - 0.1 * (par()$usr[4] - par()$usr[3]),
-             labels = levels(data$group), srt = 45, xpd = TRUE, adj = 1,
-             cex = .8)
 
-    } else
-        data
+    }
+
+    invisible(data)
+}
+
+#' @return \code{NULL}
+#' @rdname sinaplot
+#'
+#' @param formula a formula, such as y ~ grp, where y is a numeric vector of
+#' data values to be split into groups according to the grouping variable grp
+#' (usually a factor).
+#' @param data a data.frame (or list) from which the variables in formula should
+#' be taken.
+#' @param subset an optional vector specifying a subset of observations to be
+#' used for plotting.
+#' @param na.action a function which indicates what should happen when the data
+#' contain NAs. The default is to ignore missing values in either the response
+#' or the group.
+#' @method sinaplot formula
+#' @export
+sinaplot.formula <-
+    function(formula, data = NULL, ..., subset, na.action = NULL,
+             xlab, ylab)
+    {
+        if(missing(formula) || (length(formula) != 3L))
+            stop("'formula' missing or incorrect")
+        m <- match.call(expand.dots = FALSE)
+        if(is.matrix(eval(m$data, parent.frame())))
+            m$data <- as.data.frame(data)
+        m$... <- NULL
+        m$xlab <- NULL
+        m$ylab <- NULL
+        m$na.action <- na.action # force use of default for this method
+        ## need stats:: for non-standard evaluation
+        m[[1L]] <- quote(stats::model.frame)
+        mf <- eval(m, parent.frame())
+        response <- attr(attr(mf, "terms"), "response")
+        if (missing(xlab))
+            xlab <- as.character(formula)[3]
+        if (missing(ylab))
+            ylab <- names(mf)[response]
+        sinaplot(split(mf[[response]], mf[-response]), xlab = xlab, ylab = ylab,
+                 ...)
 }
 
 .compute <- function(data, method, maxwidth, adjust, bin_limit, n_bins) {
@@ -199,10 +287,7 @@ sinaplot <- function(x,
 
         #confine the samples in a (-maxwidth/2, -maxwidth/2) area around the
         #group's center
-        if (max(density$y) > 0.5 * maxwidth)
-            intra_scaling_factor <- 0.5 * maxwidth / max(density$y)
-        else
-            intra_scaling_factor <- 1
+        intra_scaling_factor <- 0.5 * maxwidth / max(density$y)
 
         # assign data points to density bins
         data$bin <- findInterval(data$y, density$x)
@@ -223,11 +308,7 @@ sinaplot <- function(x,
         bin_counts <- table(data$bin)
 
         #allow up to 50 samples in a bin without scaling
-        if (max(bin_counts) > 50 * maxwidth) {
-            intra_scaling_factor <- 50 * maxwidth / max(bin_counts)
-        } else {
-            intra_scaling_factor <- 1
-        }
+        intra_scaling_factor <- 50 * maxwidth / max(bin_counts)
 
         for (i in names(bin_counts)) {
             #examine bins with more than 'bin_limit' samples
