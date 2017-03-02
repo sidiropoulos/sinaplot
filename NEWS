@@ -1,5 +1,28 @@
 sinaplot NEWS
 
+Changes in version 1.1.0 (2017-03-03)
+
+- Major fucntional update. Sinaplot now works with data frames, lists,
+  numeric vectors and formulas, similar to boxplot and beeswarm.
+
+- Method "density" (default) no longer bins the y-axis on based on the supplied
+  "bins" parameter. Instead the inferred bins from function "density()" are
+  used.
+
+- A fixed seed is used to control the jittering of points and allow for plot
+  reproducibility.
+
+- NA's are removed. A warning is thrown if NA values are present in the data
+  informing about the number of cases removed.
+
+- "labels" parameter controls the x-axis labels. Label rotation is removed. It
+  is up to the user to control the label appearance.
+
+- sinaplot returns an invisible object regardless of "plot" parameter.
+  "bin_count" column is removed from the output.
+
+================================================================================
+
 Changes in version 1.0.0 (2016-10-11)
 
 - Major graphic update. SinaPlot now uses "base" graphics instead of ggplot2.
