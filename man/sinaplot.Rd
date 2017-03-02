@@ -11,7 +11,7 @@ sinaplot(x, ...)
 \method{sinaplot}{default}(x, groups = NULL, method = c("density",
   "counts"), scale = TRUE, adjust = 0.75, bins = 50, bin_limit = 1,
   maxwidth = 1, plot = TRUE, labels = NULL, xlab = "", ylab = "",
-  col = NULL, ...)
+  col = NULL, pch = NULL, ...)
 
 \method{sinaplot}{formula}(formula, data = NULL, ..., subset,
   na.action = NULL, xlab, ylab)
@@ -52,7 +52,8 @@ these are inferred from the data.}
 
 \item{xlab, ylab}{axis labels.}
 
-\item{col}{color for each group. Recycled if necessary.}
+\item{pch, col}{plotting characters and colors, specified by group.
+Recycled if necessary.}
 
 \item{formula}{a formula, such as y ~ grp, where y is a numeric vector of
 data values to be split into groups according to the grouping variable grp

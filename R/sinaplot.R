@@ -97,7 +97,8 @@ sinaplot <- function (x, ...)
 #'
 #' @param xlab,ylab axis labels.
 #'
-#' @param col color for each group. Recycled if necessary.
+#' @param pch,col plotting characters and colors, specified by group.
+#' Recycled if necessary.
 #'
 #' @rdname sinaplot
 #' @method sinaplot default
@@ -120,6 +121,7 @@ sinaplot.default <- function(x,
                      xlab = "",
                      ylab = "",
                      col = NULL,
+                     pch = NULL,
                      ...
                      ) {
 
@@ -218,19 +220,27 @@ sinaplot.default <- function(x,
         labels <- rep(labels, length.out = length(levels(groups)))
     }
 
+    if (is.null(col))
+        col <- par("col")
+    else
+        col <- rep(rep(col, length.out = length(unique(groups))),
+                       times = table(groups))
+
+    if (is.null(pch))
+        pch <- par("pch")
+    else
+        pch <- rep(rep(pch, length.out = length(unique(groups))),
+                   times = table(groups))
+
+    data$col <- col
+    data$pch <- pch
+
     if (plot){
 
-        if (is.null(col))
-            col <- "#000000"
-        else
-            col <- rep(rep(col, length.out = length(unique(groups))),
-                           times = table(groups))
-
         plot(data$scaled, data$y, xlab = xlab, ylab = ylab, xaxt = "n",
-             col = col, xlim = c(0.5, length(levels(data$group)) + 0.5), ...)
+             col = col, pch = pch,
+             xlim = c(0.5, length(levels(data$group)) + 0.5), ...)
         axis(1, at = 1:length(levels(data$group)), labels = labels)
-
-
     }
 
     invisible(data)
