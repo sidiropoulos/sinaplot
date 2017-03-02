@@ -60,8 +60,6 @@
 #' par(mar = old.mar)
 #'
 #' @rdname sinaplot
-#' @importFrom plyr ddply mutate
-#' @importFrom graphics axis par text
 #' @export
 
 sinaplot <- function (x, ...)
@@ -99,11 +97,13 @@ sinaplot <- function (x, ...)
 #'
 #' @param xlab,ylab axis labels.
 #'
-#' @param color vector of \code{length(unique(groups))}. Controls the sample
-#' color of each group.
+#' @param col color for each group. Recycled if necessary.
 #'
 #' @rdname sinaplot
 #' @method sinaplot default
+#' @importFrom plyr ddply mutate
+#' @importFrom graphics axis par text
+#' @importFrom stats complete.cases na.omit
 #' @export
 sinaplot.default <- function(x,
                      groups = NULL,
@@ -117,9 +117,9 @@ sinaplot.default <- function(x,
 
                      #Plot parameters
                      labels = NULL,
-                     xlab = NULL,
-                     ylab = NULL,
-                     color = NULL,
+                     xlab = "",
+                     ylab = "",
+                     col = NULL,
                      ...
                      ) {
 
@@ -130,14 +130,6 @@ sinaplot.default <- function(x,
 
         if (length(x) != length(groups))
             stop("x and groups must be of the same length.")
-    }
-
-    if (!is.null(color)){
-        if (length(color) != length(unique(groups))){
-           warning(strwrap("color and unique 'groups' values must be
-                           of the same length."))
-           color <- NULL
-        }
     }
 
     if (bin_limit < 1 | !is.numeric(bin_limit)){
@@ -179,10 +171,21 @@ sinaplot.default <- function(x,
     ###end
 
     #remove redundant labels
-    groups <- factor(groups)
+    groups <- factor(groups, levels = unique(groups))
 
     data <- data.frame(x = as.numeric(groups), y = x, group = groups,
                        x_translation = 0)
+
+    #remove NA's
+    count_na <- sum(!complete.cases(data))
+    if (count_na > 0) {
+
+        warning(paste("Removed", count_na,
+                      "rows containing non-finite values (sinaplot)"),
+                sep = " ")
+
+        data <- na.omit(data)
+    }
 
     data <- ddply(data, "group", .compute, method, maxwidth, adjust, bin_limit,
                   bins)
@@ -217,13 +220,14 @@ sinaplot.default <- function(x,
 
     if (plot){
 
-        if (is.null(color))
-            color <- "#000000"
+        if (is.null(col))
+            col <- "#000000"
         else
-            color <- color[as.numeric(data$group)]
+            col <- rep(rep(col, length.out = length(unique(groups))),
+                           times = table(groups))
 
         plot(data$scaled, data$y, xlab = xlab, ylab = ylab, xaxt = "n",
-             col = color, xlim = c(0.5, length(levels(data$group)) + 0.5), ...)
+             col = col, xlim = c(0.5, length(levels(data$group)) + 0.5), ...)
         axis(1, at = 1:length(levels(data$group)), labels = labels)
 
 
@@ -283,7 +287,7 @@ sinaplot.formula <-
 
     #per bin sample density
     if (method == "density") {
-        density <- stats::density(data$y, adjust = adjust)
+        density <- stats::density(data$y, adjust = adjust, na.rm = TRUE)
 
         #confine the samples in a (-maxwidth/2, -maxwidth/2) area around the
         #group's center
@@ -294,7 +298,7 @@ sinaplot.formula <-
 
         # jitter points based on the density
         set.seed(75)
-        x_translation <- sapply(density$y[data$bin], .jitter)
+        x_translation <- sapply(density$y[data$bin], jitter, x = 0, factor = 1)
 
         #scale and store new x coordinates
         data$x_translation <- x_translation * intra_scaling_factor
@@ -326,15 +330,14 @@ sinaplot.formula <-
                 x_translation <- stats::runif(bin_counts[i], - xmax, xmax)
 
                 #scale and store new x coordinates
-                data$x_translation[points] <- x_translation * intra_scaling_factor
+                data$x_translation[points] <-
+                    x_translation * intra_scaling_factor
             }
         }
     }
 
     data
 }
-
-.jitter <- function(x) { stats::runif(1, - x, x) }
 
 .bin_y <- function(data, bins) {
     #get y value range
