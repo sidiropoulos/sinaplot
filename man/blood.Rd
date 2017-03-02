@@ -26,4 +26,3 @@ data(blood)
 Expression data from 2095 AML/ALL and healthy bone marrow cells.
 }
 \keyword{datasets}
-
