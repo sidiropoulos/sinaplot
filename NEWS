@@ -21,6 +21,12 @@ Changes in version 1.1.0 (2017-03-03)
 - sinaplot returns an invisible object regardless of "plot" parameter.
   "bin_count" column is removed from the output.
 
+- "color" is renamed to "col" to maintain consistency with 'graphics'
+  functions.
+
+- "col" and "pch" can be used and recycled if necessary to control the color and
+  the shape of the points respectively.
+
 ================================================================================
 
 Changes in version 1.0.0 (2016-10-11)
