@@ -39,23 +39,48 @@
 #'
 #' @examples
 #'
+#' ## sinaplot on a formula:
+#'
+#' data("blood", package = "sinaplot")
+#' boxplot(Gene ~ Class, data = blood)
+#' sinaplot(Gene ~ Class, data = blood, pch = 20, add = TRUE)
+#'
+#' ## sinaplot on a data.frame:
+#'
+#' df <- data.frame(Uni05 = (1:100)/21, Norm = rnorm(100),
+#'                   `5T` = rt(100, df = 5), Gam2 = rgamma(100, shape = 2))
+#' boxplot(df)
+#' sinaplot(df, add = TRUE, pch = 20)
+#'
+#' ## sinaplot on a list:
+#'
+#' bimodal <- c(rnorm(300, -2, 0.6), rnorm(300, 2, 0.6))
+#' uniform <- runif(500, -4, 4)
+#' normal <- rnorm(800,0,3)
+#'
+#' distributions <- list(uniform = uniform, bimodal = bimodal, normal = normal)
+#' boxplot(distributions, col = 2:4)
+#' sinaplot(distributions, add = TRUE, pch = 20)
+#'
+#' ## sinaplot on a vector:
+#'
 #' x <- c(rnorm(200, 4, 1), rnorm(200, 5, 2), rnorm(400, 6, 1.5))
 #' groups <- c(rep("Cond1", 200), rep("Cond2", 200), rep("Cond3", 400))
 #'
 #' sinaplot(x, groups)
+#' sinaplot(x, groups, pch = 20, col = 2:4)
 #' sinaplot(x, groups, scale = FALSE)
 #' sinaplot(x, groups, scale = FALSE, adjust = 1/6)
 #' sinaplot(x, groups, scale = FALSE, adjust = 3)
 #'
 #' #blood
-#' data("blood", package = "sinaplot")
 #'
 #' old.mar <- par()$mar
 #' par(mar = c(9,4,4,2) + 0.1)
 #'
-#' sinaplot(blood$value, blood$type)
-#' sinaplot(blood$value, blood$type, method = "counts")
-#' sinaplot(blood$value, blood$type, method = "counts", scale = FALSE)
+#' sinaplot(blood$Gene, blood$Class)
+#' sinaplot(blood$Gene, blood$Class, method = "counts")
+#' sinaplot(blood$Gene, blood$Class, method = "counts", scale = FALSE)
 #'
 #' par(mar = old.mar)
 #'
@@ -92,6 +117,8 @@ sinaplot <- function (x, ...)
 #' @param plot logical. When \code{TRUE} the sinaplot is produced, otherwise the
 #' function returns the new sample coordinates. Default: \code{TRUE}.
 #'
+#' @param add logical. If true add boxplot to current plot.
+#'
 #' @param labels labels for each group. Recycled if necessary. By default,
 #' these are inferred from the data.
 #'
@@ -103,7 +130,7 @@ sinaplot <- function (x, ...)
 #' @rdname sinaplot
 #' @method sinaplot default
 #' @importFrom plyr ddply mutate
-#' @importFrom graphics axis par text
+#' @importFrom graphics points axis par text box
 #' @importFrom stats complete.cases na.omit
 #' @export
 sinaplot.default <- function(x,
@@ -114,9 +141,10 @@ sinaplot.default <- function(x,
                      bins = 50,
                      bin_limit = 1,
                      maxwidth = 1,
-                     plot = TRUE,
 
                      #Plot parameters
+                     plot = TRUE,
+                     add = FALSE,
                      labels = NULL,
                      xlab = "",
                      ylab = "",
@@ -162,9 +190,17 @@ sinaplot.default <- function(x,
 
         } else {
 
-            groups <- rep(names(x), sapply(x, length))
+            if (x.names) {
+                groups <- rep(names(x), sapply(x, length))
+            } else {
+                groups <- rep(1:length(x), sapply(x, length))
+            }
+
             x <- unlist(x, use.names = FALSE)
+
         }
+    } else {
+        x.names <- TRUE
     }
 
     bin <- NULL
@@ -173,7 +209,8 @@ sinaplot.default <- function(x,
     ###end
 
     #remove redundant labels
-    groups <- factor(groups, levels = unique(groups))
+    if (!is.factor(groups))
+        groups <- factor(groups, levels = unique(groups))
 
     data <- data.frame(x = as.numeric(groups), y = x, group = groups,
                        x_translation = 0)
@@ -206,41 +243,51 @@ sinaplot.default <- function(x,
     data$x_translation <- NULL
     data$bin <- NULL
 
+    n.groups <- length(levels(groups))
+
     if(missing(labels) || is.null(labels)) {
         if(!x.names) {
-            if(length(levels(groups)) == 1) {
+            if(n.groups == 1) {
                 labels <- NA
             } else {
-                labels <- 1:length(levels(groups))
+                labels <- 1:n.groups
             }
         } else {
             labels <- levels(groups)
         }
     } else {
-        labels <- rep(labels, length.out = length(levels(groups)))
+        labels <- rep(labels, length.out = n.groups)
     }
 
     if (is.null(col))
         col <- par("col")
     else
-        col <- rep(rep(col, length.out = length(unique(groups))),
-                       times = table(groups))
+        col <- rep(rep(col, length.out = n.groups), times = table(groups))
 
     if (is.null(pch))
         pch <- par("pch")
     else
-        pch <- rep(rep(pch, length.out = length(unique(groups))),
-                   times = table(groups))
+        pch <- rep(rep(pch, length.out = n.groups), times = table(groups))
 
     data$col <- col
     data$pch <- pch
 
     if (plot){
 
-        plot(data$scaled, data$y, xlab = xlab, ylab = ylab, xaxt = "n",
-             col = col, pch = pch,
-             xlim = c(0.5, length(levels(data$group)) + 0.5), ...)
-        axis(1, at = 1:length(levels(data$group)), labels = labels)
+        if (!add) {
+
+            xlim <- c(0.5, length(levels(data$group)) + 0.5)
+            ylim <- range(data$y[is.finite(data$y)])
+
+            plot(xlim, ylim, type = 'n', axes = FALSE,
+                     xlab = xlab, ylab = ylab, ...)
+
+        }
+
+        points(data$scaled, data$y, col = col, pch = pch, ...)
+        axis(1, at = 1:n.groups, labels = labels, ...)
+        axis(2, ...)
+        box(...)
     }
 
     invisible(data)
