@@ -2,7 +2,7 @@
 #'
 #' @usage data(blood)
 #' @format A data frame with 2095 rows and 2
-#' columns (AML/ALL subtype, expression values).
+#' columns (Class (AML/ALL subtype), Gene expression values).
 #'
 #' @source \url{http://servers.binf.ku.dk/bloodspot/}
 #' @source \url{http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE13159}
