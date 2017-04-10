@@ -121,10 +121,15 @@ sinaplot <- function (x, ...)
 #' @param maxwidth control the maximum width the points can spread into. Values
 #' between 0 and 1.
 #'
+#' @param seed a single value that controls the random sample jittering. Set to
+#' an integer to enable plot reproducibility. Default NULL.
+#'
 #' @param plot logical. When \code{TRUE} the sinaplot is produced, otherwise the
 #' function returns the new sample coordinates. Default: \code{TRUE}.
 #'
 #' @param add logical. If true add boxplot to current plot.
+#'
+#' @param log logical. If true it uses a logarihmic scale on the y-axis.
 #'
 #' @param labels labels for each group. Recycled if necessary. By default,
 #' these are inferred from the data.
@@ -148,10 +153,12 @@ sinaplot.default <- function(x,
                      bins = 50,
                      bin_limit = 1,
                      maxwidth = 1,
+                     seed = NULL,
 
                      #Plot parameters
                      plot = TRUE,
                      add = FALSE,
+                     log = FALSE,
                      labels = NULL,
                      xlab = "",
                      ylab = "",
@@ -172,6 +179,11 @@ sinaplot.default <- function(x,
     if (bin_limit < 1 | !is.numeric(bin_limit)){
         warning("Invalid bin_limit value. bin_limit was set to 1.")
         bin_limit <- 1
+    }
+
+    if (!is.logical(log)) {
+        warning("log must be TRUE/FALSE. log is set to FALSE")
+        log <- FALSE
     }
 
     if (bins <= 0) {
@@ -234,7 +246,7 @@ sinaplot.default <- function(x,
     }
 
     data <- ddply(data, "group", .compute, method, maxwidth, adjust, bin_limit,
-                  bins)
+                  bins, seed)
 
     if (scale) {
         group_max  <- ddply(data, "group", mutate,
@@ -279,16 +291,26 @@ sinaplot.default <- function(x,
     data$col <- col
     data$pch <- pch
 
+    ylim <- range(data$y[is.finite(data$y)])
+
+    if (log) {
+        if (any(ylim < 0)) {
+            warning(paste("Logarithmic axis must have positive limits.",
+                          "Log set to FALSE.", sep = " "))
+            ylog <- ""
+        } else
+            ylog <- "y"
+    } else
+        ylog <- ""
+
     if (plot){
 
         if (!add) {
 
             xlim <- c(0.5, length(levels(data$group)) + 0.5)
-            ylim <- range(data$y[is.finite(data$y)])
 
-            plot(xlim, ylim, type = 'n', axes = FALSE,
+            plot(xlim, ylim, type = 'n', axes = FALSE, log = ylog,
                      xlab = xlab, ylab = ylab, ...)
-
         }
 
         points(data$scaled, data$y, col = col, pch = pch, ...)
@@ -340,7 +362,7 @@ sinaplot.formula <-
                  ...)
 }
 
-.compute <- function(data, method, maxwidth, adjust, bin_limit, n_bins) {
+.compute <- function(data, method, maxwidth, adjust, bin_limit, n_bins, seed) {
     #initialize x_translation and bin_counts to 0
 
     #if group has less than 2 points return as is
@@ -361,7 +383,8 @@ sinaplot.formula <-
         data$bin <- findInterval(data$y, density$x)
 
         # jitter points based on the density
-        set.seed(75)
+        if (!is.null(seed))
+            set.seed(seed)
         x_translation <- sapply(density$y[data$bin], jitter, x = 0, factor = 1)
 
         #scale and store new x coordinates
@@ -390,7 +413,8 @@ sinaplot.formula <-
                 xmax <- bin_counts[i] / 100
 
                 #assign the samples uniformely within the specified range
-                set.seed(75)
+                if (!is.null(seed))
+                    set.seed(seed)
                 x_translation <- stats::runif(bin_counts[i], - xmax, xmax)
 
                 #scale and store new x coordinates

@@ -10,8 +10,8 @@ sinaplot(x, ...)
 
 \method{sinaplot}{default}(x, groups = NULL, method = c("density",
   "counts"), scale = TRUE, adjust = 0.75, bins = 50, bin_limit = 1,
-  maxwidth = 1, plot = TRUE, add = FALSE, labels = NULL, xlab = "",
-  ylab = "", col = NULL, pch = NULL, ...)
+  maxwidth = 1, seed = NULL, plot = TRUE, add = FALSE, log = FALSE,
+  labels = NULL, xlab = "", ylab = "", col = NULL, pch = NULL, ...)
 
 \method{sinaplot}{formula}(formula, data = NULL, ..., subset,
   na.action = NULL, xlab, ylab)
@@ -44,10 +44,15 @@ than \code{bin_limit}, the samples's X coordinates will be adjusted.}
 \item{maxwidth}{control the maximum width the points can spread into. Values
 between 0 and 1.}
 
+\item{seed}{a single value that controls the random sample jittering. Set to
+an integer to enable plot reproducibility. Default NULL.}
+
 \item{plot}{logical. When \code{TRUE} the sinaplot is produced, otherwise the
 function returns the new sample coordinates. Default: \code{TRUE}.}
 
 \item{add}{logical. If true add boxplot to current plot.}
+
+\item{log}{logical. If true it uses a logarihmic scale on the y-axis.}
 
 \item{labels}{labels for each group. Recycled if necessary. By default,
 these are inferred from the data.}
