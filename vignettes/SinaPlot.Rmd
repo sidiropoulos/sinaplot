@@ -55,12 +55,16 @@ knitr::kable(head(blood, 10))
 
 ---
 ```{r bloodDensity, fig.align='center', fig.height=6, fig.width=7}
-par(mar = c(9,4,4,2) + 0.1)
-sinaplot(Gene ~ Class, data = blood, pch = 20, xaxt = "n", ann = FALSE)
-text(x = 1:length(unique(blood$Class)),
-     y = par()$usr[3] - 0.1 * (par()$usr[4] - par()$usr[3]),
-     labels = levels(blood$Class), srt = 45, xpd = TRUE, adj = 1,
-     cex = .8)
+sinaplot(Gene ~ Class, data = blood, pch = 20)
+```
+
+---
+
+By setting the argument `scale = FALSE` we turn off the group-wise scaling based
+on the class with the highest density.
+
+```{r bloodScaleOff, fig.align='center', fig.height=6, fig.width=7}
+sinaplot(Gene ~ Class, data = blood, pch = 20, scale = FALSE)
 ```
 
 ---
@@ -69,25 +73,22 @@ Using the `method = "counts"` to compute the borders we get a less smooth
 spread of the samples due to the absence of the kernel density estimate.
 
 ```{r bloodCounts, fig.align='center', fig.height=6, fig.width=7}
-par(mar = c(9,4,4,2) + 0.1)
-sinaplot(Gene ~ Class, data = blood, method = "counts", scale = FALSE,
-         pch = 20, xaxt = "n", ann = FALSE)
-text(x = 1:length(unique(blood$Class)),
-     y = par()$usr[3] - 0.1 * (par()$usr[4] - par()$usr[3]),
-     labels = levels(blood$Class), srt = 45, xpd = TRUE, adj = 1,
-     cex = .8)
+sinaplot(Gene ~ Class, data = blood, pch = 20, scale = FALSE, method = "counts")
 ```
 
 ---
 
-By setting the argument `scale = FALSE we` turn off the relative scaling of all 
-the sample types based on the one with the highest density.
+Sinaplot aesthetics can be tweaked in the same manner as in 
+[graphics::plot](https://rdrr.io/r/graphics/plot.html).
 
-```{r bloodScaleOff, fig.align='center', fig.height=6, fig.width=7}
+```{r bloodParams, fig.align='center', fig.height=6, fig.width=7}
 par(mar = c(9,4,4,2) + 0.1)
-sinaplot(Gene ~ Class, data = blood, method = "counts", scale = FALSE,
-         pch = 20, xaxt = "n", ann = FALSE)
-text(x = 1:length(unique(blood$Class)),
+n_groups <- length(levels(blood$Class))
+
+sinaplot(Gene ~ Class, data = blood, pch = 20, xaxt = "n", col = rainbow(n_groups), 
+         ann = FALSE, bty = "n")
+axis(1, at = 1:n_groups, labels = FALSE)
+text(x = 1:n_groups,
      y = par()$usr[3] - 0.1 * (par()$usr[4] - par()$usr[3]),
      labels = levels(blood$Class), srt = 45, xpd = TRUE, adj = 1,
      cex = .8)
@@ -99,8 +100,8 @@ Using a subset of the ```blood``` dataset we compare sinaplot with 5 popular
 plotting strategies, and show how our package integrates features from these
 methods to achieve truthful and yet simple representation of multiclass
 single variable data.
-    ![](../inst/figures/comparison.png)
-    
+    <img src="../inst/figures/comparison.png" width = 650 height = 800>
+
 ## Session info
 
 ```{r sessionInfo}
