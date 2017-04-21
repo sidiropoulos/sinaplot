@@ -1,6 +1,6 @@
 sinaplot NEWS
 
-Changes in version 1.1.0 (2017-03-23)
+Changes in version 1.1.0 (2017-04-10)
 
 - Major fucntional update. Sinaplot now works with data frames, lists,
   numeric vectors and formulas, similar to boxplot and beeswarm.
@@ -9,11 +9,11 @@ Changes in version 1.1.0 (2017-03-23)
   "bins" parameter. Instead the inferred bins from function "density()" are
   used.
 
-- A fixed seed is used to control the jittering of points and allow for plot
-  reproducibility.
+- A random seed is added as an optional argument and can be used to control the
+  random sample jittering and allow for plot reproducibility.
 
-- NA's are removed. A warning is thrown if NA values are present in the data
-  informing about the number of cases removed.
+- NA's are automatically removed. A warning is thrown if NA values are present
+  in the data informing about the number of cases removed.
 
 - "labels" parameter controls the x-axis labels. Label rotation is removed. It
   is up to the user to control the label appearance.
