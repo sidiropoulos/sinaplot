@@ -1,38 +1,22 @@
 citHeader("To cite sinaplot in publications, please use:")
 
-titl <- meta$Title
-year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date)
-vers <- paste("R package version", meta$Version)
-
-citEntry(entry="Manual",
-    title = titl,
-    author = personList( as.person("Sidiropoulos N."),
-                         as.person("Sohi S.H."),
-                         as.person("Rapin N."),
-                         as.person("Bagger F.O.")),
-	publisher = "manual",
-    year         = year,
-    note         = vers,
-    url          = "https://cran.r-project.org/package=sinaplot",
-    textVersion =
-        paste("Sidiropoulos. N, Sohi S.H., Rapin N., Bagger F.O. (",year ,"). ",
-               titl, ", ", vers, ".", sep=""))
-
 citEntry(
-    entry = "TechReport",
+    entry = "article",
     title = "SinaPlot: an enhanced chart for simple and truthful representation of single observations over multiple classes",
     author = personList( as.person("Nikos Sidiropoulos"),
                          as.person("Sina Hadi Sohi"),
+                         as.person("Thomas Lin Pedersen"),
+                         as.person("Bo Torben Porse"),
+                         as.person("Ole Winther"),
                          as.person("Nicolas Rapin"),
                          as.person("Frederik Otzen Bagger")),
-    booktitle = "bioRxiv",
-    institution = "Cold Spring Harbor Labs Journals",
-    year = 2015,
-    month = "Oct",
-    doi = "10.1101/028191",
-    url = "http://biorxiv.org/content/early/2015/10/02/028191.abstract",
+    journal = "Journal of Computational and Graphical Statistics",
+    year = 2017,
+    month = "Aug",
+    doi = "10.1080/10618600.2017.1366914",
+    url = "http://dx.doi.org/10.1080/10618600.2017.1366914",
     textVersion =
-        paste("Sidiropoulos. N, Sohi S.H., Rapin N., Bagger F.O.,",
+        paste("Sidiropoulos. N, Sohi S.H., Pedersen T.L., Porse B.T., Winther O., Rapin N., Bagger F.O. (2017)",
         "SinaPlot: an enhanced chart for simple and truthful representation of single observations over multiple classes.",
-        "bioRxiv doi: http://dx.doi.org/10.1101/028191", sep = " ")
-        )
+        "JCGS, http://dx.doi.org/10.1080/10618600.2017.1366914", sep = " ")
+)

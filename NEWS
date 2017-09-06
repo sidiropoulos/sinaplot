@@ -1,5 +1,9 @@
 sinaplot NEWS
 
+Changes in version 1.1.1 (2017-09-06)
+
+- Updated CITATION.
+
 Changes in version 1.1.0 (2017-04-10)
 
 - Major fucntional update. Sinaplot now works with data frames, lists,

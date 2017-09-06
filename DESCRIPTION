@@ -2,8 +2,8 @@ Package: sinaplot
 Type: Package
 Title: An Enhanced Chart for Simple and Truthful Representation of Single
     Observations over Multiple Classes
-Version: 1.1.0
-Date: 2017-04-10
+Version: 1.1.1
+Date: 2017-09-06
 Authors@R: c(person("Nikos", "Sidiropoulos", role = c("aut", "cre"),
     email = "nikos.sidiro@gmail.com"), person("Sina Hadi", "Sohi", role = "aut",
     email = "sinasohi@gmail.com"), person("Nicolas", "Rapin", role = "aut",
